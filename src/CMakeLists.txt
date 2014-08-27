@@ -1,12 +1,17 @@
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 project(3dLocalizer)
 
 find_package(PCL 1.2 REQUIRED)
+set(OpenCV_DIR /home/michal/OpenCV/Debug/)
+find_package(OpenCV REQUIRED)
 
-include_directories(${PCL_INCLUDE_DIRS})
+include_directories(${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable (3dLocalizer_exe pcl_visualizer.cpp)
-target_link_libraries (3dLocalizer_exe ${PCL_LIBRARIES})
+#ADD HERE FURTHER SOURCE FILES
+set(3D_SOURCE 3dLocalizer.cpp Caster.cpp)
+
+add_executable (3dLocalizer_exe ${3D_SOURCE})
+target_link_libraries (3dLocalizer_exe ${PCL_LIBRARIES} )#${OpenCV_LIBS})
