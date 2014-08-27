@@ -24,18 +24,31 @@ Caster::~Caster() {
 vector<double> Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 		vector<Point2f> imagePoints) {
 	cloudCasted=false;imageCasted=false;
+	while(true)
+	{
 // wybierz punkt P
+	PointXYZ P; //TEMP
+	tangentialPoint = P;
 
-//oblicz plaszczyzne styczna
+	calculateTangentialPlaneCoeff();
 
-// rzutuj punkty chmury i obrazu
+	vector<PointXYZ> castedImage = castImagePoints(imagePoints);
+	vector<PointXYZ> castedCloud = castCloudPoints(cloudPoints);
 
 // transformuj (SVD)
 
-// oblicz stddev
+// oblicz stddev??
 
 //zacznij od poczatku lub skoncz
-	return vector<double>();
+	if(true) break;//TODO zrobic warunek
+	}
+
+	vector<double> output;
+	output.push_back(A);
+	output.push_back(B);
+	output.push_back(C);
+	output.push_back(D);
+	return output;
 }
 
 void Caster::calculateTangentialPlaneCoeff() {
