@@ -40,23 +40,24 @@ public:
 	/*
 	 * Casts cloud to image. Points in arguments are corresponding
 	 *
-	 * @return vector of plane coefficients
+	 * @return (vector of plane coefficients, centroid of image keypoints)
 	 */
-	vector<double> cloudToImage(vector<PointXYZ> cloudPoints,
+	std::pair<vector<double>, PointXYZ> cloudToImage(vector<PointXYZ> cloudPoints,
 			vector<Point2f> imagePoints);
 
 	/*
 	 * Casts 2d points on 3d plane
 	 *
-	 * Function assumes, that specified center is corresponding
-	 * to basic point of image's coordinate system
+	 * Function casts points on 3d plane given by A, B, C, D.
+	 * It not guarantees proper rotation after cast,
+	 * it needs to be done manually.
 	 *
-	 * @param center Assumed center
+	 * @param castedCentroid centroid on points after cast
 	 * @return vector of castes coordinates
 	 */
 	vector<PointXYZ> imageOnPlane(PointXYZ center, vector<Point2f> points);
-	vector<PointXYZ> imageOnPlane(double A, double B, double C, double D,
-			PointXYZ center, vector<Point2f> points);
+	static vector<PointXYZ> imageOnPlane(double A, double B, double C, double D,
+			PointXYZ castedCentroid, vector<Point2f> points);
 
 private:
 	void calculateTangentialPlaneCoeff();

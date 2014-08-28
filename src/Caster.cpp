@@ -18,24 +18,24 @@ Caster::Caster() {
 }
 
 Caster::~Caster() {
-	// TODO Auto-generated destructor stub
+
 }
 
-vector<double> Caster::cloudToImage(vector<PointXYZ> cloudPoints,
+std::pair<vector<double>, PointXYZ> Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 		vector<Point2f> imagePoints) {
 	cloudCasted=false;imageCasted=false;
 	while(true)
 	{
-// wybierz punkt P
+// TODO: wybierz punkt P
 	PointXYZ P; //TEMP
 	tangentialPoint = P;
 
 	calculateTangentialPlaneCoeff();
 
-	vector<PointXYZ> castedImage = castImagePoints(imagePoints);
+	vector<PointXYZ> castedImage = imageOnPlane(A, B, C, D, tangentialPoint, imagePoints);
 	vector<PointXYZ> castedCloud = castCloudPoints(cloudPoints);
 
-// transformuj (SVD)
+// TODO: transformuj (SVD)
 
 // oblicz stddev??
 
@@ -43,12 +43,34 @@ vector<double> Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 	if(true) break;//TODO zrobic warunek
 	}
 
-	vector<double> output;
-	output.push_back(A);
-	output.push_back(B);
-	output.push_back(C);
-	output.push_back(D);
+	std::pair<vector<double>, PointXYZ> output;
+	output.first.push_back(A);
+	output.first.push_back(B);
+	output.first.push_back(C);
+	output.first.push_back(D);
+	output.second=tangentialPoint;
 	return output;
+}
+
+vector<PointXYZ> Caster::imageOnPlane(double A, double B, double C, double D, PointXYZ castedCentroid, vector<Point2f> points){
+	if (A == 1 && B == 3 && C == 3 && D == 7) {
+		std::cerr
+				<< "ABCD = 1337: Lack of initialization probable \n FUNCTION RETURN";
+	}
+	vector<PointXYZ> pointsIn3d = vector<PointXYZ>();
+
+	//TODO: code!
+
+	//Quaternion:
+	// <cos phi/2 ; dx sin phi/2 ; dy sin phi/2 ; dz sin phi/2>
+	// phi = arcos( C / sqrt(AA+BB+CC) )
+	// alpha: Ax + By + D = 0
+	// d = [-B, A, 0] ?TODO: napewno?
+
+	// Translation: (x,y) += tangential - centroid'
+	//	vector<PointXYZ> pointsIn3d(points.size(), 0);
+
+	return pointsIn3d;
 }
 
 void Caster::calculateTangentialPlaneCoeff() {
@@ -71,7 +93,6 @@ void Caster::calculateTangentialPlaneCoeff() {
 
 vector<PointXYZ> Caster::castCloudPoints(vector<PointXYZ> points) {
 
-//	vector<PointXYZ> output(points.size(), 0);
 	vector<PointXYZ> output = vector<PointXYZ>();
 	for (int i = 0; i < points.size(); i++) {
 		double cx = points[i].x;
@@ -87,33 +108,52 @@ vector<PointXYZ> Caster::castCloudPoints(vector<PointXYZ> points) {
 	return output;
 }
 
-vector<PointXYZ> Caster::castImagePoints(vector<Point2f> points) {
-	if (A == 1 && B == 3 && C == 3 && D == 7) {
-		std::cerr
-				<< "ABCD = 1337: Lack of initialization probable \n FUNCTION RETURN";
-	}
-//	vector<PointXYZ> pointsIn3d(points.size(), 0);
-	vector<PointXYZ> pointsIn3d = vector<PointXYZ>();
-	//Ax + By + Cz + D = 0
-	//z = (-Ax -By -D) / C
-	for (int i = 0; i < points.size(); i++) {
-		pointsIn3d[i].x = points[i].x + tangentialPoint.x;
-		pointsIn3d[i].y = points[i].y + tangentialPoint.y;
-		pointsIn3d[i].z = (-A * pointsIn3d[i].x - B * pointsIn3d[i].y - D) / C;
-	}
-	imageCasted = true;
-	return pointsIn3d;
-}
+
 
 vector<PointXYZ> Caster::transformPoints(vector<PointXYZ> imagePoints, vector<PointXYZ> cloudPoints)
 {
-	if (!cloudCasted || imageCasted)
+	if (!cloudCasted || !imageCasted)
 	{
 		cerr<<"Cast error";
 		return vector<PointXYZ>();
 	}
 
 	//Here point have to be in the same centroid (casted)
+
+	//Calculating centroids
+	PointXYZ C_centroid, I_centroid;
+	for (int i=0; i<imagePoints.size(); i++)
+	{
+		C_centroid.x += cloudPoints[i].x;
+		C_centroid.y += cloudPoints[i].y;
+		C_centroid.z += cloudPoints[i].z;
+		I_centroid.x += imagePoints[i].x;
+		I_centroid.y += imagePoints[i].y;
+		I_centroid.z += imagePoints[i].z;
+	}
+	C_centroid /= cloudPoints.size();
+	I_centroid /= imagePoints.size();
+
+	//Covariance matrix
+	Mat_<float> covariance = Mat::zeros(3,3,CV_32F);
+	for (int i=0; i<imagePoints.size();i++)
+	{
+		Mat_<float> I = Mat::zeros(1,3,CV_32F);
+		Mat_<float> C = Mat::zeros(3,1,CV_32F);
+		I(0) = imagePoints[i].x - I_centroid.x;
+		I(1) = imagePoints[i].y - I_centroid.y;
+		I(2) = imagePoints[i].z - I_centroid.z;
+		C(0) = cloudPoints[i].x - C_centroid.x;
+		C(1) = cloudPoints[i].y - C_centroid.y;
+		C(2) = cloudPoints[i].z - C_centroid.z;
+		covariance += C*I;
+	}
+
+	//SVD
+	Mat_<float> U, S, Vt;
+	SVD::compute(covariance, S, U, Vt);
+	Mat_<float> R = Vt.t()*U.t();
+
 
 }
 

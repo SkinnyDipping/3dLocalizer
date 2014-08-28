@@ -10,6 +10,7 @@
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include "opencv2/opencv.hpp"
+#include "Caster.h"
 
 using namespace std;
 using namespace pcl;
@@ -19,6 +20,9 @@ using namespace cv;
 #define VIDEO_FILE "UZULNIC"
 
 //#define VISUALIZATION
+
+vector<PointXYZ> assignCloudPoints();
+vector<Point2f> assignImagePoints();
 
 int main() {
 
