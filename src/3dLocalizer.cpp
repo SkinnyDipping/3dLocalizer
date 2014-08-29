@@ -51,7 +51,7 @@ int main() {
 	vector<Point2f> imagePoints = assignImagePoints();
 
 	Caster cast = Caster();
-	vector<double> planeCoefs = cast.cloudToImage(cloudPoints, imagePoints);
+	vector<double> planeCoefs = cast.cloudToImage(cloudPoints, imagePoints).first;
 
 #ifdef VISUALIZATION
 	//VISUALIZATION
