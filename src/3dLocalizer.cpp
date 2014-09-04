@@ -51,7 +51,7 @@ int main() {
 	vector<Point2f> imagePoints = assignImagePoints();
 
 	Caster cast = Caster();
-	vector<double> planeCoefs = cast.cloudToImage(cloudPoints, imagePoints).first;
+//	vector<double> planeCoefs = cast.cloudToImage(cloudPoints, imagePoints).first;
 
 #ifdef VISUALIZATION
 	//VISUALIZATION
@@ -61,8 +61,10 @@ int main() {
 }
 
 vector<PointXYZ> assignCloudPoints() {
+	cout<<"Assign cloud points"<<endl;
 	return vector<PointXYZ>();
 }
 vector<Point2f> assignImagePoints() {
+	cout<<"assign imag points"<<endl;
 	return vector<Point2f>();
 }

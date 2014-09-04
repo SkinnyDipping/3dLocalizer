@@ -5,15 +5,21 @@
 #include "opencv2/opencv.hpp"
 #include "Caster.h"
 #include <vector>
+#include "Utils.h"
 
 using namespace std;
 using namespace pcl;
 using namespace cv;
 
 //#define TRANS_MATRIX
-//#define QUAT
-//#define TAN_PLANE
-#define CLOUD_CAST
+#define QUAT //FFAILED
+//#define CLOUD_CAST
+
+void out(vector<PointXYZ> v)
+{
+	for(int i=0; i<v.size(); i++)
+			cout<<v[i].x<<"\t"<<v[i].y<<"\t"<<v[i].z<<endl;
+}
 
 int main()
 {
@@ -22,6 +28,7 @@ int main()
 	cast.centerSphere = PointXYZ(5, 6, 9);
 	cast.radius = 3;
 	cast.tangentialPoint = PointXYZ(5, 9, 9);
+	cast.calculateTangentialPlaneCoeff();
 
 #ifdef CLOUD_CAST
 	PointXYZ A = PointXYZ(4,5,8);
@@ -35,6 +42,9 @@ int main()
 	v.push_back(C);
 	v.push_back(D);
 	v.push_back(E);
+	out(v);
+	vector<PointXYZ> a = cast.castCloudPoints(v);
+	out(a);
 #endif
 
 #ifdef TRANS_MATRIX
@@ -59,30 +69,26 @@ int main()
 	v2.push_back(D2);
 	cout << cast.calculateTransformationMatrix(v1, v2)<<endl;
 #endif
-#ifdef TAN_PLANE
-	
-	cast.calculateTengentialPlaneCoeff();
-	cout<<cast.A<<"\t"<<cast.B<<"\t"<<cast.C<<"\t"<<cast.D<<endl;
-#endif
 
 #ifdef QUAT
-	PointXYZ A = PointXYZ(-8,4);
-	PointXYZ B = PointXYZ(-6,5);
-	PointXYZ C = PointXYZ(-11,5);
-	PointXYZ D = PointXYZ(-7,6);
-	PointXYZ E = PointXYZ(-12,6);
-	vector<PointXYZ> v;
+	Point2f A = Point2f(0,0);
+	Point2f B = Point2f(-6,5);
+	Point2f C = Point2f(-11,5);
+	Point2f D = Point2f(-7,6);
+	Point2f E = Point2f(-12,6);
+	vector<Point2f> v;
 	v.push_back(A);
 	v.push_back(B);
 	v.push_back(C);
 	v.push_back(D);
 	v.push_back(E);
+//	out(v);cout<<endl;
+	cout<<v<<endl<<endl;
 
 	vector<PointXYZ> v2 = Caster::imageOnPlane(0, 3, 0, -27, PointXYZ(5, 9, 9), v);
-
-	for (int i = 0; i < v2.size();i++)
-	cout << v2[i] << endl;
-
+out(v2);
+//	for (int i = 0; i < v2.size();i++)
+//	cout << v2[i] << endl;
 #endif
 
 	return 0;

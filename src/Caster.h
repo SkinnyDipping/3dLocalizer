@@ -13,6 +13,8 @@
 #include "pcl/point_types.h"
 #include "pcl/io/io.h"
 #include "opencv2/opencv.hpp"
+#include "Utils.h"
+#include "Quaternion.h"
 
 using namespace cv;
 using namespace std;
@@ -20,63 +22,7 @@ using namespace pcl;
 
 class Caster {
 
-private:
-	class Quaternion
-	{
-	public:
-		double w, x, y, z;
-
-		Quaternion(double w, double x, double y, double z){
-			this->w = w;
-			this->x = x;
-			this->y = y;
-			this->z = z;
-		}
-
-		Quaternion(double angle, PointXYZ vector)
-		{
-
-			this->w = cos(angle / 2);
-			double sinus = sin(angle / 2);
-			this->x = vector.x*sinus;
-			this->y = vector.y*sinus;
-			this->z = vector.z*sinus;
-		}
-
-		Quaternion(double angle, vector<double> vector)
-		{
-			PointXYZ vector = PointXYZ(vector[0], vector[1], vector[2]);
-			Quaternion(angle, vector);
-		}
-
-		Mat_<double> toTransformationMatrix()
-		{
-			float xx = x*x, yy = y*y, zz = z*z, xy = x*y, xz = x*z, yz = y*z, wx = w*x, wy = w*y, wz = w*z;
-			Mat_<double> output = Mat(4, 4, CV_64F);
-
-			output(0, 0) = 1 - 2 * (yy + zz);
-			output(0, 1) = 2 * (xy + wz);
-			output(0, 2) = 2 * (xz - wy);
-			output(0, 3) = 0;
-
-			output(1, 0) = 2 * (xy - wz);
-			output(1, 1) = 1 - 2 * (xx + zz);
-			output(1, 2) = 2 * (yz + wx);
-			output(1, 3) = 0;
-
-			output(2, 0) = 2 * (xz + wy);
-			output(2, 1) = 2 * (yz - wx);
-			output(2, 2) = 1 - 2 * (xx + yy);
-			output(2, 3) = 0;
-
-			output(3, 0) = 0;
-			output(3, 1) = 0;
-			output(3, 2) = 0;
-			output(3, 3) = 1;
-
-			return output;
-		}
-	};
+//private:
 
 public:
 	//Tangential plane coefficients:
@@ -101,8 +47,8 @@ public:
 	 *
 	 * @return (vector of plane coefficients, centroid of image keypoints)
 	 */
-	std::pair<vector<double>, PointXYZ> cloudToImage(vector<PointXYZ> cloudPoints,
-			vector<Point2f> imagePoints);
+	std::pair<vector<double>, PointXYZ> cloudToImage(
+			vector<PointXYZ> cloudPoints, vector<Point2f> imagePoints);
 
 	/*
 	 * Casts 2d points on 3d plane
@@ -127,10 +73,10 @@ public:
 	double MSE(vector<PointXYZ> set1, vector<PointXYZ> set2);
 
 	//TODO implement
-	double distance(PointXYZ p1, PointXYZ p1);
-	double distance(Point2f p1, Point2f p2);
+	double distance(PointXYZ p1, PointXYZ p2);
+//	double distance(Point2f p1, Point2f p2);
 
-	PointXYZ transformPoint(PointXYZ point, Mat_<float> matrix);
+	static PointXYZ transformPoint(PointXYZ point, Mat_<float> matrix);
 
 };
 
