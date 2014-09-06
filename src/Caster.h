@@ -23,7 +23,6 @@ using namespace pcl;
 class Caster {
 
 //private:
-
 public:
 	//Tangential plane coefficients:
 	//Ax + By + Cz + D = 0
