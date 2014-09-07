@@ -48,12 +48,32 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 		imagePoints[i].x -= imageCentroid.x;
 		imagePoints[i].y -= imageCentroid.y;
 	}
-cout<<imagePoints<<endl;
-	while (true) {
+//cout<<imagePoints<<endl;
+	for(int lkjhg=0;lkjhg<50;lkjhg++) {
 // TODO: wybierz punkt P
 
 //TODO SPRAWDZIĆ TRANSLACJE DO ŚRODKA DO CHUJA JEBAKI WAŁA
-		PointXYZ P=PointXYZ(0,24,-7); //TEMP
+//		PointXYZ P=PointXYZ(0,24,-7); //TEMP
+		PointXYZ P;
+if(lkjhg==45) P=PointXYZ(0,24,-7); else{
+		double xP = rand() % ((int)radius/2);
+		double yP = rand() % ((int)radius/2);
+		double zP;
+		while (true) {
+			zP = rand() % ((int)radius/2);
+			if ((xP - centerSphere.x) * (xP - centerSphere.x)
+					+ (yP - centerSphere.y) * (yP - centerSphere.y)
+					+ (zP - centerSphere.z) * (zP - centerSphere.z)
+					<= radius * radius)
+				break;
+			cout<<xP<<"\t"<<yP<<"\t"<<zP<<endl;
+		}
+		P = PointXYZ(xP,yP,zP);}
+
+
+
+
+
 		this->tangentialPoint = P;
 
 		calculateTangentialPlaneCoeff();
@@ -61,28 +81,28 @@ cout<<imagePoints<<endl;
 		vector<PointXYZ> castedImage = imageOnPlane(this->A, this->B, this->C,
 				this->D, this->tangentialPoint, imagePoints);
 		vector<PointXYZ> castedCloud = castCloudPoints(cloudPoints);
-cout<<"RESULT"<<endl;out(castedImage);cout<<endl;out(castedCloud);
+//cout<<"RESULT"<<endl;out(castedImage);cout<<endl;out(castedCloud);
 		//This is the index of reference point.
 		//TODO some intelligent choosing
 		int referenceIdx = 0;
 
 		//Calculating rotation angle (using dot product)
 		PointXYZ I = castedImage[referenceIdx], C = castedCloud[referenceIdx];
-cout<<endl<<I<<endl<<C<<endl;
+//cout<<endl<<I<<endl<<C<<endl;
 		I = Utils::normalizeVector(I);
 		C = Utils::normalizeVector(C);
 		double angle = acos(Utils::dotProduct(I, C));
-cout<<"angle "<<angle*180/3.14<<endl;//angle=90*3.14/180;
+//cout<<"angle "<<angle*180/3.14<<endl;//angle=90*3.14/180;
 		//Rotating castedCloud points
 		vector<PointXYZ> rotatedPoints;
 		PointXYZ vector = Utils::normalizeVector(PointXYZ(this->A,this->B,this->C));
-cout<<"vector "<<vector<<endl;
+//cout<<"vector "<<vector<<endl;
 		Quaternion qtrn = Quaternion(angle, vector);
-qtrn.out();
+//qtrn.out();
 //		for (int i = 0; i < castedCloud.size(); i++)
 			//Actual rotation
 			rotatedPoints=Quaternion::rotate(castedCloud, qtrn, tangentialPoint);
-out(rotatedPoints);
+//out(rotatedPoints);
 		//Scale and scaling
 		PointXYZ scale = determineScale(castedImage[referenceIdx],
 				rotatedPoints[referenceIdx]);
@@ -101,7 +121,7 @@ out(rotatedPoints);
 			this->minMSE = mse;
 		}
 #define THRESHOLD 0.1
-//		if (minMSE - THRESHOLD <= 0)
+		if (minMSE - THRESHOLD <= 0)
 			break;
 #undef THRESHOLD
 	}
@@ -136,7 +156,7 @@ vector<PointXYZ> Caster::imageOnPlane(double A, double B, double C, double D,
 	double normVec = sqrt(B * B + A * A+C*C);
 	PointXYZ vector = PointXYZ(B/normVec,-A/normVec,0);
 	Quaternion q = Quaternion(-phi, vector);
-q.out();
+//q.out();
 	for (int i = 0; i < points.size(); i++) {
 		pointsIn3d.push_back(PointXYZ(points[i].x, points[i].y, 0));
 //		pointsIn3d[i] = Quaternion::rotate(pointsIn3d[i], q, tangentialPoint);

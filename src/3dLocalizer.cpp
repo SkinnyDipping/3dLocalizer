@@ -11,22 +11,24 @@
 #include <pcl/visualization/cloud_viewer.h>
 #include "opencv2/opencv.hpp"
 #include "Caster.h"
+#include "CloudHandler.h"
 
 using namespace std;
 using namespace pcl;
 using namespace cv;
 
-#define CLOUD_FILE "/home/michal/PDM/3dLocalizer/PointClouds/pcd/sample2.pcd"
+//#define CLOUD_FILE "/home/michal/PDM/3dLocalizer/PointClouds/pcd/sample.pcd"
+#define CLOUD_FILE "/home/michal/PDM/3dLocalizer/PointClouds/pcd/scan_062.pcd"
 #define VIDEO_FILE "UZULNIC"
 
-//#define VISUALIZATION
+#define VISUALIZATION
+//#define VIEWER_TEST
 
 vector<PointXYZ> assignCloudPoints();
 vector<Point2f> assignImagePoints();
 
 int main() {
 
-#ifdef VISUALIZATION
 	PointCloud<PointXYZ>::Ptr cloud(new PointCloud<PointXYZ>);
 
 	if (io::loadPCDFile<PointXYZ>(CLOUD_FILE, *cloud) == -1) {
@@ -34,28 +36,18 @@ int main() {
 		return -1;
 	}
 
-	VideoCapture videoSource(VIDEO_FILE);
-	Mat calibrationFrame;
-	videoSource >> calibrationFrame;
-#endif
 
-//		for (int i = 0; i < cloud->points.size(); i++)
-//			cout << cloud->points[i] << endl;
+		visualization::CloudViewer viewer("Simple Cloud Viewer");
+		viewer.showCloud(cloud, "C");
+		while (!viewer.wasStopped()) {
+		}
 
-//		visualization::CloudViewer viewer("Simple Cloud Viewer");
-//		viewer.showCloud(cloud, "C");
-//		while (!viewer.wasStopped()) {
-//		}
+//	vector<PointXYZ> cloudPoints = assignCloudPoints();
+//	vector<Point2f> imagePoints = assignImagePoints();
 
-	vector<PointXYZ> cloudPoints = assignCloudPoints();
-	vector<Point2f> imagePoints = assignImagePoints();
-
-	Caster cast = Caster();
+//	Caster cast = Caster();
 //	vector<double> planeCoefs = cast.cloudToImage(cloudPoints, imagePoints).first;
 
-#ifdef VISUALIZATION
-	//VISUALIZATION
-#endif
 
 	return 0;
 }
