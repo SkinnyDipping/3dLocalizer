@@ -50,7 +50,8 @@ public:
 
 		Mat_<double> toTransformationMatrix();
 
-		static PointXYZ rotate(PointXYZ point, Quaternion q, PointXYZ rotationPoint);
+		static PointXYZ rotate(PointXYZ point, Quaternion q, PointXYZ rotationPoint=PointXYZ(0,0,0));
+		static vector<PointXYZ> rotate(vector<PointXYZ> point, Quaternion q, PointXYZ rotationPoint=PointXYZ(0,0,0));
 
 };
 

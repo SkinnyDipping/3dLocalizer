@@ -15,6 +15,7 @@
 #include "opencv2/opencv.hpp"
 #include "Utils.h"
 #include "Quaternion.h"
+#include "TransformationMatrix.h"
 
 using namespace cv;
 using namespace std;
@@ -27,13 +28,15 @@ public:
 	//Tangential plane coefficients:
 	//Ax + By + Cz + D = 0
 	double A, B, C, D;
-	vector<double> finestCoeff;
 
 	//Virtual sphere properties: center and radius
 	PointXYZ centerSphere;
 	double radius;
 
 	PointXYZ tangentialPoint;
+	Quaternion quaternion;
+	PointXYZ scaleFactor;
+	double minMSE;
 
 	bool cloudCasted, imageCasted;
 
@@ -46,8 +49,7 @@ public:
 	 *
 	 * @return (vector of plane coefficients, centroid of image keypoints)
 	 */
-	std::pair<vector<double>, PointXYZ> cloudToImage(
-			vector<PointXYZ> cloudPoints, vector<Point2f> imagePoints);
+	Mat cloudToImage(vector<PointXYZ> cloudPoints, vector<Point2f> imagePoints);
 
 	/*
 	 * Casts 2d points on 3d plane
@@ -60,7 +62,7 @@ public:
 	 * @return vector of castes coordinates
 	 */
 	vector<PointXYZ> imageOnPlane(PointXYZ center, vector<Point2f> points);
-	static vector<PointXYZ> imageOnPlane(double A, double B, double C, double D,
+	vector<PointXYZ> imageOnPlane(double A, double B, double C, double D,
 			PointXYZ castedCentroid, vector<Point2f> points);
 
 public:
@@ -71,16 +73,12 @@ public:
 			vector<PointXYZ> cloudPoints);
 	double MSE(vector<PointXYZ> set1, vector<PointXYZ> set2);
 
-	//TODO implement
 	double distance(PointXYZ p1, PointXYZ p2);
-//	double distance(Point2f p1, Point2f p2);
 
 	static PointXYZ transformPoint(PointXYZ point, Mat_<float> matrix);
-
-	Mat_<double> combineTransformationMatrix(PointXYZ targetPoint, double rotationAngle, double scaleFactor=1);
+	PointXYZ determineScale(PointXYZ initialPoint, PointXYZ finalPoint);
+	void out(vector<PointXYZ> v);
 
 };
 
 #endif /* CASTER_H_ */
-
-//TODO SCALE IS ALSO NEEDED

@@ -7,6 +7,7 @@
 #include <vector>
 #include "Utils.h"
 #include "Quaternion.h"
+#include "TransformationMatrix.h"
 
 using namespace std;
 using namespace pcl;
@@ -23,54 +24,84 @@ void out(vector<PointXYZ> v) {
 		cout << v[i].x << "\t" << v[i].y << "\t" << v[i].z << endl;
 }
 
-
-
 int main() {
 	Caster cast = Caster();
 
-	cast.centerSphere = PointXYZ(0, -2, -7);
-	cast.radius = 26;
+//	cast.centerSphere = PointXYZ(0, -2, -7);
+//	cast.radius = 26;
 
 #ifdef POINT_PARALLEL
 	cast.tangentialPoint = PointXYZ(0, -2, 19);
 #else
-	cast.tangentialPoint = PointXYZ(0, 24, -7);
+//	cast.tangentialPoint = PointXYZ(0, 24, -7);
 #endif
 
-//	PointXYZ A = PointXYZ(19, -13, 6);
-//	PointXYZ B = PointXYZ(-19, 10, -4);
-//	PointXYZ C = PointXYZ(-5, -20, -11);
-//	PointXYZ D = PointXYZ(14, 4, -9);
-//	PointXYZ E = PointXYZ(-9, 9, -17);
+	PointXYZ A = PointXYZ(19, -13, 6);
+	PointXYZ B = PointXYZ(-19, 10, -4);
+	PointXYZ C = PointXYZ(-5, -20, -11);
+	PointXYZ D = PointXYZ(14, 4, -9);
+	PointXYZ E = PointXYZ(-9, 9, -17);
 //	cast.calculateTangentialPlaneCoeff();
-//	vector<PointXYZ> v;
-//	v.push_back(A);
-//	v.push_back(B);
-//	v.push_back(C);
-//	v.push_back(D);
-//	v.push_back(E);
-	PointXYZ p = PointXYZ(7,9,8);
-	PointXYZ p2=PointXYZ(20,18,10);
-	PointXYZ s =PointXYZ(7,9,5);
-//	Quaternion v = Quaternion(0, p.x, p.y, p.z);
+	vector<PointXYZ> v;
+	v.push_back(A);
+	v.push_back(B);
+	v.push_back(C);
+	v.push_back(D);
+	v.push_back(E);
 
-	PointXYZ I=p, C=p2;
-			I=Utils::normalizeVector(I);
-			C=Utils::normalizeVector(C);
-			double angle = acos(Utils::dotProduct(I,C));
-			cout<<angle<<endl;
+//	Point2f A2 = Point2f(19,18);
+//	Point2f B2 = Point2f(-19,28);
+//	Point2f C2 = Point2f(-5,35);
+//	Point2f D2 = Point2f(14,33);
+//	Point2f E2 = Point2f(-9,41);
+	Point2f A2 = Point2f(21.2132,5.6568);
+	Point2f B2 = Point2f(-12.7279,-14.1421);
+	Point2f C2 = Point2f(-0.7071,-6.3639);
+	Point2f D2 = Point2f(7.0711,12.7279);
+	Point2f E2 = Point2f(-14.8492,2.1213);
+	vector<Point2f> v3;
+	v3.push_back(A2);
+	v3.push_back(B2);
+	v3.push_back(C2);
+	v3.push_back(D2);
+	v3.push_back(E2);
+
+//	cast.cloudToImage(v,v3);
+	cerr << cast.cloudToImage(v, v3) << endl;
+
+//	PointXYZ p = PointXYZ(0,0,0);
+//	PointXYZ p2=PointXYZ(2,2,0);
+//	PointXYZ s =PointXYZ(7,9,5);
+//	Quaternion v = Quaternion(0, s.x, s.y, s.z);
+
+//	PointXYZ I=p, C=p2;
+//			I=Utils::normalizeVector(I);
+//			C=Utils::normalizeVector(C);
+//			cout<<I<<"\t"<<C<<endl;
+//			double li = sqrt(I.x*I.x+I.y*I.y+I.z*I.z);
+//			double lc = sqrt(C.x*C.x+C.y*C.y+C.z*C.z);
+//			double dot = Utils::dotProduct(I,C);
+//			double angle = acos(Utils::dotProduct(I,C));///li/lc);
+//			cout<<angle*180/3.14<<endl;
 
 //	Quaternion q = Quaternion(0.70711,0,-0.70711,0);
-	Quaternion q = Quaternion(1.57,PointXYZ(0,1,0));
+//	Quaternion q = Quaternion(1.57,PointXYZ(0,0,1));
 //	Quaternion q=Quaternion(2,4,6,4);
 //	Quaternion temp2 = q.inv();
 //	q.normalize();
 //	Quaternion temp = (q*v);
 //	temp.out();
-//	cout<<Quaternion::rotate(p,q,PointXYZ(7,9,5));
+//	PointXYZ P=Quaternion::rotate(p2,q);
+//	PointXYZ scale = cast.determineScale(P,p2);
+//	double scale = p2.x/P.x;
+
+//	cout<<P<<"\t"<<p2;//<<"\t"<<scale<<endl;
+//	Mat_<double> translate = Mat::zeros(4,4,CV_64F);
+//	cout<<translate(3,3)<<endl;
+//	Mat matrix = TransformationMatrix::combineMatrix(p,q,PointXYZ(2,2,2));
+//	cout<<matrix<<endl<<cast.transformPoint(p2,matrix)<<endl;
+
 //	q.out();
-
-
 
 #ifdef CLOUD_CAST
 	vector<PointXYZ> a = cast.castCloudPoints(v);
