@@ -16,17 +16,17 @@ using namespace cv;
 class ImageHandler {
 
 private:
-	Mat& image;
-	vector<pcl::PointXYZ> image3d;
+	Mat image;
+	vector<pcl::PointXYZRGB> image3d;
 
 private:
-ImageHandler();
+	ImageHandler();
 public:
 	ImageHandler(std::string pathToImage);
 	virtual ~ImageHandler();
 
 	Mat& getImage();
-	vector<pcl::PointXYZ>& getImage3d();
+	vector<pcl::PointXYZRGB>& getImage3d();
 };
 
 #endif /* IMAGEHANDLER_H_ */
