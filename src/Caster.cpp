@@ -195,40 +195,7 @@ double Caster::MSE(vector<PointXYZ> set1, vector<PointXYZ> set2) {
 	return MSE;
 }
 
-//OK
-PointXYZ Caster::transformPoint(PointXYZ point, Mat_<float> matrix) {
-	PointXYZ output = PointXYZ(0, 0, 0);
-	Mat_<float> pointMat = Mat(4, 1, CV_32F);
-	pointMat(0) = point.x;
-	pointMat(1) = point.y;
-	pointMat(2) = point.z;
-	pointMat(3) = 1;
-	Mat_<float> outputMat = matrix * pointMat;
-	output.x = outputMat(0);
-	output.y = outputMat(1);
-	output.z = outputMat(2);
 
-	return output;
-}
-
-//OK
-PointXYZRGB Caster::transformPoint(PointXYZRGB point, Mat_<float> matrix) {
-	PointXYZRGB output = PointXYZRGB(0, 0, 0);
-	Mat_<float> pointMat = Mat(4, 1, CV_32F);
-	pointMat(0) = point.x;
-	pointMat(1) = point.y;
-	pointMat(2) = point.z;
-	pointMat(3) = 1;
-	Mat_<float> outputMat = matrix * pointMat;
-	output.x = outputMat(0);
-	output.y = outputMat(1);
-	output.z = outputMat(2);
-	output.r = point.r;
-	output.g = point.g;
-	output.b = point.b;
-
-	return output;
-}
 
 //OK
 PointXYZ Caster::determineScale(PointXYZ initialPoint, PointXYZ finalPoint) {

@@ -97,8 +97,7 @@ private:
 	 */
 	double distance(PointXYZ p1, PointXYZ p2);
 
-	static PointXYZ transformPoint(PointXYZ point, Mat_<float> matrix);
-	static PointXYZRGB transformPoint(PointXYZRGB point, Mat_<float> matrix);
+
 	PointXYZ determineScale(PointXYZ initialPoint, PointXYZ finalPoint);
 	void out(vector<PointXYZ> v);	//TEMP
 

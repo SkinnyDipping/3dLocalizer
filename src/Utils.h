@@ -27,6 +27,9 @@ public:
 	static PointXYZ calculateCentroid(vector<PointXYZ> points);
 	static Point2f calculateCentroid(vector<Point2f> points);
 
+	static PointXYZ transformPoint(PointXYZ point, Mat_<float> matrix);
+	static PointXYZRGB transformPoint(PointXYZRGB point, Mat_<float> matrix);
+
 };
 
 #endif /* UTILS_H_ */
