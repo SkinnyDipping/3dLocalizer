@@ -13,10 +13,19 @@
 using namespace pcl;
 
 class Sphere {
+private:
+	double radius;
+	PointXYZ center;
+	std::vector<PointXYZ> points;
+
 public:
-	Sphere();
+	Sphere(PointXYZ center, double radius);
 	virtual ~Sphere();
-	static std::vector<PointXYZ> getSpherePoints(double R, double resolution);
+
+	std::vector<PointXYZ>& generateSphere(double resolution=1);
+	std::vector<PointXYZ>& getSpherePoints();
+
+	static std::vector<PointXYZ> getSpherePoints(double Radius, PointXYZ center=PointXYZ(0,0,0), double resolution=1);
 
 	class Coors {
 	public:

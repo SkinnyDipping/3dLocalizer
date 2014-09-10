@@ -16,6 +16,7 @@
 #include "Utils.h"
 #include "Quaternion.h"
 #include "TransformationMatrix.h"
+#include "Sphere.h"
 
 using namespace cv;
 using namespace std;
@@ -47,10 +48,11 @@ public:
 	/*
 	 * Casts cloud to image. Points in arguments are corresponding
 	 *
-	 * @return (vector of plane coefficients, centroid of image keypoints)
+	 * @return Transformation Matrix image->cloud. Image's centroid shall be at origin
 	 */
 	Mat cloudToImage(vector<PointXYZ> cloudPoints, vector<Point2f> imagePoints);
 
+private:
 	/*
 	 * Casts 2d points on 3d plane
 	 *
@@ -59,25 +61,46 @@ public:
 	 * it needs to be done manually.
 	 *
 	 * @param castedCentroid centroid on points after cast
-	 * @return vector of castes coordinates
+	 * @return vector of casted coordinates
 	 */
 	vector<PointXYZ> imageOnPlane(PointXYZ center, vector<Point2f> points);
 	vector<PointXYZ> imageOnPlane(double A, double B, double C, double D,
 			PointXYZ castedCentroid, vector<Point2f> points);
 
-public:
+	/*
+	 * Calculates and assigns A,B,C,D coefficients of tangential plane in tangentialPoint
+	 * (which lies on sphere)
+	 */
 	void inline calculateTangentialPlaneCoeff();
+
+	/*
+	 * Casts cloud points on a ABCD plane
+	 */
 	vector<PointXYZ> castCloudPoints(vector<PointXYZ> points);
+
+	/*
+	 * Casts image points on ABCD plane
+	 *
+	 * @param Points shall have z coordinate = 0
+	 */
 	vector<PointXYZ> castImagePoints(vector<Point2f> points);
 	Mat_<float> calculateTransformationMatrix(vector<PointXYZ> imagePoints,
 			vector<PointXYZ> cloudPoints);
+
+	/*
+	 * Computes Mean Square Error between two sets of points
+	 */
 	double MSE(vector<PointXYZ> set1, vector<PointXYZ> set2);
 
+	/*
+	 * Carthesian distance between two points
+	 */
 	double distance(PointXYZ p1, PointXYZ p2);
 
 	static PointXYZ transformPoint(PointXYZ point, Mat_<float> matrix);
+	static PointXYZRGB transformPoint(PointXYZRGB point, Mat_<float> matrix);
 	PointXYZ determineScale(PointXYZ initialPoint, PointXYZ finalPoint);
-	void out(vector<PointXYZ> v);
+	void out(vector<PointXYZ> v);	//TEMP
 
 };
 

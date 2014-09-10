@@ -7,11 +7,12 @@
 
 #include "Sphere.h"
 
-//#define DEG2RAD 0.0174532925f
-//#define RAD2DEG 57.2957795f
+#define DEG2RAD 0.0174532925f
+#define RAD2DEG 57.2957795f
 
-Sphere::Sphere() {
-	// TODO Auto-generated constructor stub
+Sphere::Sphere(PointXYZ center, double radius) {
+	this->center = center;
+	this->radius=radius;
 
 }
 
@@ -19,10 +20,30 @@ Sphere::~Sphere() {
 	// TODO Auto-generated destructor stub
 }
 
-std::vector<PointXYZ> Sphere::getSpherePoints(double R, double resolution) {
+std::vector<PointXYZ>& Sphere::generateSphere(double resolution)
+{
+	for (int i=-180; i<180; i+=resolution)
+		for(int j=-180; j<180; j+=resolution)
+		{
+			PointXYZ p = Coors::sphericalToCartesian(PointXYZ(radius,i*DEG2RAD, j*DEG2RAD));
+			p.x+=this->center.x;p.y+=this->center.y;p.z+=this->center.z;
+			this->points.push_back(p);
+		}
+	return this->points;
+}
+
+std::vector<PointXYZ> Sphere::getSpherePoints(double R, PointXYZ center, double resolution) {
 	std::vector<PointXYZ> spherePoints;
-
-
+//TODO add resolution
+	for (int i=-90; i<90; i++)
+		for(int j=-90; j<90; j++)
+		{
+			PointXYZ p;
+			p.x = R*cos(i*DEG2RAD)*cos(j*DEG2RAD)+center.x;
+			p.y = R*cos(i*DEG2RAD)*sin(j*DEG2RAD)+center.y;
+			p.z = R*sin(i*DEG2RAD)+center.z;
+			spherePoints.push_back(p);
+		}
 
 	return spherePoints;
 }

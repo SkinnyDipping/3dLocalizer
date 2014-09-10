@@ -9,6 +9,7 @@
 
 #define SQ(a) (a*a)
 
+//TEMP
 void Caster::out(vector<PointXYZ> v) {
 	for (int i = 0; i < v.size(); i++)
 		cout << v[i].x << "\t" << v[i].y << "\t" << v[i].z << endl;
@@ -20,10 +21,11 @@ Caster::Caster() {
 	C = 3;
 	D = 7;
 	minMSE = 9999999;
-	radius=0;
+	radius = 0;
 }
 
-Caster::~Caster() {}
+Caster::~Caster() {
+}
 
 Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 		vector<Point2f> imagePoints) {
@@ -48,31 +50,16 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 		imagePoints[i].x -= imageCentroid.x;
 		imagePoints[i].y -= imageCentroid.y;
 	}
+
+	//Getting vector of sphere point
+	vector<PointXYZ> spherePoints = Sphere::getSpherePoints(this->radius, this->centerSphere);
+//	spherePoints.push_back(PointXYZ(0,24,-7)); //TEMP
 //cout<<imagePoints<<endl;
-	for(int lkjhg=0;lkjhg<50;lkjhg++) {
-// TODO: wybierz punkt P
+	for (int spherePointIndex = 0; spherePointIndex < spherePoints.size(); spherePointIndex++) {
 
 //TODO SPRAWDZIĆ TRANSLACJE DO ŚRODKA DO CHUJA JEBAKI WAŁA
 //		PointXYZ P=PointXYZ(0,24,-7); //TEMP
-		PointXYZ P;
-if(lkjhg==45) P=PointXYZ(0,24,-7); else{
-		double xP = rand() % ((int)radius/2);
-		double yP = rand() % ((int)radius/2);
-		double zP;
-		while (true) {
-			zP = rand() % ((int)radius/2);
-			if ((xP - centerSphere.x) * (xP - centerSphere.x)
-					+ (yP - centerSphere.y) * (yP - centerSphere.y)
-					+ (zP - centerSphere.z) * (zP - centerSphere.z)
-					<= radius * radius)
-				break;
-			cout<<xP<<"\t"<<yP<<"\t"<<zP<<endl;
-		}
-		P = PointXYZ(xP,yP,zP);}
-
-
-
-
+		PointXYZ P = spherePoints[spherePointIndex];
 
 		this->tangentialPoint = P;
 
@@ -81,28 +68,29 @@ if(lkjhg==45) P=PointXYZ(0,24,-7); else{
 		vector<PointXYZ> castedImage = imageOnPlane(this->A, this->B, this->C,
 				this->D, this->tangentialPoint, imagePoints);
 		vector<PointXYZ> castedCloud = castCloudPoints(cloudPoints);
-//cout<<"RESULT"<<endl;out(castedImage);cout<<endl;out(castedCloud);
+
 		//This is the index of reference point.
 		//TODO some intelligent choosing
 		int referenceIdx = 0;
 
 		//Calculating rotation angle (using dot product)
 		PointXYZ I = castedImage[referenceIdx], C = castedCloud[referenceIdx];
-//cout<<endl<<I<<endl<<C<<endl;
+
 		I = Utils::normalizeVector(I);
 		C = Utils::normalizeVector(C);
 		double angle = acos(Utils::dotProduct(I, C));
-//cout<<"angle "<<angle*180/3.14<<endl;//angle=90*3.14/180;
+
 		//Rotating castedCloud points
 		vector<PointXYZ> rotatedPoints;
-		PointXYZ vector = Utils::normalizeVector(PointXYZ(this->A,this->B,this->C));
-//cout<<"vector "<<vector<<endl;
+		PointXYZ vector = Utils::normalizeVector(
+				PointXYZ(this->A, this->B, this->C));
+
 		Quaternion qtrn = Quaternion(angle, vector);
-//qtrn.out();
-//		for (int i = 0; i < castedCloud.size(); i++)
-			//Actual rotation
-			rotatedPoints=Quaternion::rotate(castedCloud, qtrn, tangentialPoint);
-//out(rotatedPoints);
+
+
+		//Actual rotation
+		rotatedPoints = Quaternion::rotate(castedCloud, qtrn, tangentialPoint);
+
 		//Scale and scaling
 		PointXYZ scale = determineScale(castedImage[referenceIdx],
 				rotatedPoints[referenceIdx]);
@@ -114,18 +102,17 @@ if(lkjhg==45) P=PointXYZ(0,24,-7); else{
 
 		//Calculating MSE
 		double mse = MSE(castedCloud, castedImage);
-		cerr<<mse<<endl;
 		if (mse < minMSE) {
 			this->quaternion = qtrn;
 			this->scaleFactor = scale;
 			this->minMSE = mse;
 		}
-#define THRESHOLD 0.1
+#define THRESHOLD 20
 		if (minMSE - THRESHOLD <= 0)
 			break;
 #undef THRESHOLD
 	}
-this->quaternion.out();cout<<tangentialPoint<<endl<<scaleFactor<<endl;
+
 	return TransformationMatrix::combineMatrix(this->tangentialPoint,
 			this->quaternion, this->scaleFactor);
 }
@@ -137,7 +124,7 @@ vector<PointXYZ> Caster::imageOnPlane(double A, double B, double C, double D,
 		std::cerr
 				<< "ABCD = 1337: Lack of initialization probable \n FUNCTION RETURN";
 	}
-	vector<PointXYZ> pointsIn3d,points2;
+	vector<PointXYZ> pointsIn3d, points2;
 
 	//Calculating centroid and translating to origin
 //	Point2f I_centroid = Utils::calculateCentroid(points);
@@ -145,7 +132,7 @@ vector<PointXYZ> Caster::imageOnPlane(double A, double B, double C, double D,
 //		points[i].x -= I_centroid.x;
 //		points[i].y -= I_centroid.y;
 //	}
-//cout<<"IC:"<<I_centroid<<endl;
+
 	//Quaternion:
 	// <cos phi/2 ; dx sin phi/2 ; dy sin phi/2 ; dz sin phi/2>
 	// phi = arcos( C / sqrt(AA+BB+CC) )
@@ -153,15 +140,14 @@ vector<PointXYZ> Caster::imageOnPlane(double A, double B, double C, double D,
 	// d = [-B, A, 0]
 
 	double phi = acos(C / sqrt(A * A + B * B + C * C));
-	double normVec = sqrt(B * B + A * A+C*C);
-	PointXYZ vector = PointXYZ(B/normVec,-A/normVec,0);
+	double normVec = sqrt(B * B + A * A + C * C);
+	PointXYZ vector = PointXYZ(B / normVec, -A / normVec, 0);
 	Quaternion q = Quaternion(-phi, vector);
-//q.out();
+
 	for (int i = 0; i < points.size(); i++) {
 		pointsIn3d.push_back(PointXYZ(points[i].x, points[i].y, 0));
-//		pointsIn3d[i] = Quaternion::rotate(pointsIn3d[i], q, tangentialPoint);
 	}
-	points2 = Quaternion::rotate(pointsIn3d,q,tangentialPoint);
+	points2 = Quaternion::rotate(pointsIn3d, q, tangentialPoint);
 	return points2;
 }
 
@@ -221,6 +207,25 @@ PointXYZ Caster::transformPoint(PointXYZ point, Mat_<float> matrix) {
 	output.x = outputMat(0);
 	output.y = outputMat(1);
 	output.z = outputMat(2);
+
+	return output;
+}
+
+//OK
+PointXYZRGB Caster::transformPoint(PointXYZRGB point, Mat_<float> matrix) {
+	PointXYZRGB output = PointXYZRGB(0, 0, 0);
+	Mat_<float> pointMat = Mat(4, 1, CV_32F);
+	pointMat(0) = point.x;
+	pointMat(1) = point.y;
+	pointMat(2) = point.z;
+	pointMat(3) = 1;
+	Mat_<float> outputMat = matrix * pointMat;
+	output.x = outputMat(0);
+	output.y = outputMat(1);
+	output.z = outputMat(2);
+	output.r = point.r;
+	output.g = point.g;
+	output.b = point.b;
 
 	return output;
 }
