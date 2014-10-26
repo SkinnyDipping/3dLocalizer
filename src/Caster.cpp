@@ -32,6 +32,8 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 	cloudCasted = false;
 	imageCasted = false;
 
+	cout << "imagePoints:\n" << imagePoints << endl;
+
 	//Finding centroid of cloud
 	PointXYZ cloudCentroid = Utils::calculateCentroid(cloudPoints);
 
@@ -52,69 +54,97 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 	}
 
 	//Getting vector of sphere point
-	vector<PointXYZ> spherePoints = Sphere::getSpherePoints(this->radius, this->centerSphere);
-//	spherePoints.push_back(PointXYZ(0,24,-7)); //TEMP
-//cout<<imagePoints<<endl;
+	vector<PointXYZ> spherePoints = Sphere::getSpherePoints(this->radius,
+			this->centerSphere);
+
+//#define ALL_POINTS
+#ifdef ALL_POINTS
 	for (int spherePointIndex = 0; spherePointIndex < spherePoints.size(); spherePointIndex++) {
-
-//TODO SPRAWDZIĆ TRANSLACJE DO ŚRODKA DO CHUJA JEBAKI WAŁA
-//		PointXYZ P=PointXYZ(0,24,-7); //TEMP
 		PointXYZ P = spherePoints[spherePointIndex];
+#else
+	PointXYZ P = PointXYZ(0, 24, -7); //TEMP
+#endif
 
-		this->tangentialPoint = P;
+	this->tangentialPoint = P;
 
-		calculateTangentialPlaneCoeff();
+	calculateTangentialPlaneCoeff();
 
-		vector<PointXYZ> castedImage = imageOnPlane(this->A, this->B, this->C,
-				this->D, this->tangentialPoint, imagePoints);
-		vector<PointXYZ> castedCloud = castCloudPoints(cloudPoints);
+	cout << "imagePoints:\n" << imagePoints << endl;
+	cout << "cloud point:\n";Utils::out(cloudPoints);
 
-		//This is the index of reference point.
-		//TODO some intelligent choosing
-		int referenceIdx = 0;
+	vector<PointXYZ> castedImage = imageOnPlane(this->A, this->B, this->C,
+			this->D, this->tangentialPoint, imagePoints);
+	vector<PointXYZ> castedCloud = castCloudPoints(cloudPoints);
 
-		//Calculating rotation angle (using dot product)
-		PointXYZ I = castedImage[referenceIdx], C = castedCloud[referenceIdx];
+	cout<<"casted image:\n";Utils::out(castedImage);
+	cout<<"casted cloud:\n";Utils::out(castedCloud);
 
-		I = Utils::normalizeVector(I);
-		C = Utils::normalizeVector(C);
-		double angle = acos(Utils::dotProduct(I, C));
+	//This is the index of reference point.
+	//TODO some intelligent choosing
+	int referenceIdx = 0;
+//#ifdef ALL_POINTS
+	//Calculating rotation angle (using dot product)
+	PointXYZ I = castedImage[referenceIdx], C = castedCloud[referenceIdx];
+	I.x -= tangentialPoint.x;
+	I.y -= tangentialPoint.y;
+	I.z -= tangentialPoint.z;
+	C.x -= tangentialPoint.x;
+	C.y -= tangentialPoint.y;
+	C.z -= tangentialPoint.z;
+	cout<<"I: "<<I<<"\nC: "<<C<<endl;
 
-		//Rotating castedCloud points
-		vector<PointXYZ> rotatedPoints;
-		PointXYZ vector = Utils::normalizeVector(
-				PointXYZ(this->A, this->B, this->C));
+	I = Utils::normalizeVector(I);
+	C = Utils::normalizeVector(C);
+	cout<<"In: "<<I<<"\nCn: "<<C<<endl;
+	cout <<"Dot :"<<Utils::dotProduct(I, C)<<endl;
+	double angle = acos(Utils::dotProduct(I, C));
 
-		Quaternion qtrn = Quaternion(angle, vector);
+	cout<<"Angle: "<<RAD2DEG(angle)<<endl;
 
+	//Rotating castedCloud points
+	vector<PointXYZ> rotatedPoints;
+	PointXYZ vector = Utils::normalizeVector(
+			PointXYZ(this->A, this->B, this->C));
 
-		//Actual rotation
-		rotatedPoints = Quaternion::rotate(castedCloud, qtrn, tangentialPoint);
+	Quaternion qtrn = Quaternion(angle, vector);
+	qtrn.out();
 
-		//Scale and scaling
-		PointXYZ scale = determineScale(castedImage[referenceIdx],
-				rotatedPoints[referenceIdx]);
-		for (int i = 0; i < castedImage.size(); i++) {
-			castedImage[i].x *= scale.x;
-			castedImage[i].y *= scale.y;
-			castedImage[i].z *= scale.z;
-		}
+	//Actual rotation
+	rotatedPoints = Quaternion::rotate(castedImage, qtrn, tangentialPoint);
+//#endif
+	//TEMP
+//	vector<PointXYZ> rotatedPoints = castedCloud;
+	cout<<"Rotated Points:\n";
+	Utils::out(rotatedPoints);
 
-		//Calculating MSE
-		double mse = MSE(castedCloud, castedImage);
-		if (mse < minMSE) {
-			this->quaternion = qtrn;
-			this->scaleFactor = scale;
-			this->minMSE = mse;
-		}
-#define THRESHOLD 20
-		if (minMSE - THRESHOLD <= 0)
-			break;
-#undef THRESHOLD
+	//Scale and scaling
+	Mat_<double> scaleMatrix = determineScale(castedImage[referenceIdx],
+			rotatedPoints[referenceIdx],tangentialPoint);
+	for (int i = 0; i < castedImage.size(); i++) {
+				castedImage[i]=Utils::add(castedImage[i], PointXYZ(-tangentialPoint.x, -tangentialPoint.y, -tangentialPoint.z));
+				castedImage[i]=Utils::transformPoint(castedImage[i],scaleMatrix);
+				castedImage[i]=Utils::add(castedImage[i],tangentialPoint);
+			}
+	cout << "SCALE: " << scaleMatrix<<endl;
+	this->scaleMatrix=scaleMatrix;
+#ifdef ALL_POINTS
+	//Calculating MSE
+	double mse = MSE(castedCloud, castedImage);
+	if (mse < minMSE) {
+		this->quaternion = qtrn;
+		this->scaleMatrix = scaleMatrix;
+		this->minMSE = mse;
 	}
 
+#define THRESHOLD 2
+	if (minMSE - THRESHOLD <= 0)
+	break;
+#undef THRESHOLD
+}
+#endif
+
 	return TransformationMatrix::combineMatrix(this->tangentialPoint,
-			this->quaternion, this->scaleFactor);
+			this->quaternion, this->scaleMatrix);
 }
 
 //OK
@@ -147,6 +177,7 @@ vector<PointXYZ> Caster::imageOnPlane(double A, double B, double C, double D,
 	for (int i = 0; i < points.size(); i++) {
 		pointsIn3d.push_back(PointXYZ(points[i].x, points[i].y, 0));
 	}
+	this->quaternion=q;
 	points2 = Quaternion::rotate(pointsIn3d, q, tangentialPoint);
 	return points2;
 }
@@ -195,30 +226,30 @@ double Caster::MSE(vector<PointXYZ> set1, vector<PointXYZ> set2) {
 	return MSE;
 }
 
-
-
 //OK
-PointXYZ Caster::determineScale(PointXYZ initialPoint, PointXYZ finalPoint) {
+Mat Caster::determineScale(PointXYZ initialPoint, PointXYZ finalPoint,
+		PointXYZ centroid) {
 #define INF (1.0/0.0)
-	double sx = finalPoint.x / initialPoint.x;
-	double sy = finalPoint.y / initialPoint.y;
-	double sz = finalPoint.z / initialPoint.z;
-//	if (!(sx != sx || sx == INF || sx == -INF || sx==0)) {
-//		sy = sx;
-//		sz = sx;
-//	} else if (!(sy != sy || sy == INF || sy == -INF||sy==0)) {
-//		sx = sy;
-//		sz = sy;
-//	} else if (!(sz != sz || sz == INF || sz == -INF||sz==0)) {
-//		sx = sz;
-//		sy = sz;
-//	} else {
-//		sx = 1;
-//		sy = 1;
-//		sz = 1;
-//	}
+	double sx = (finalPoint.x - centroid.x) / (initialPoint.x - centroid.x);
+	double sy = (finalPoint.y - centroid.y) / (initialPoint.y - centroid.y);
+	double sz = (finalPoint.z - centroid.z) / (initialPoint.z - centroid.z);
+	if (sx != sx||sx==INF)
+		sx = 1;
+	if (sy != sy||sy==INF)
+		sy = 1;
+	if (sz != sz||sz==INF)
+		sz = 1;
+//	if(sx!=sx || sy!= sy || sz!=sz)
+//		cerr<<"Failed determining scale: scale coefficient is nan\n";
+//	if (sx == INF || sy == INF || sz == INF)
+//		cerr << "Failed determining scale: scale coefficient is INF\n";
 #undef INF
-	return PointXYZ(sx, sy, sz);
+//	return PointXYZ(sx, sy, sz);
+	Mat_<double> matrix = Mat::eye(4,4,CV_64F);
+	matrix(0,0) = sx;
+	matrix(1,1) = sy;
+	matrix(2,2) = sz;
+	return matrix;
 }
 
 //OK

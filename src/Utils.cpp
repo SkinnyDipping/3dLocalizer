@@ -102,3 +102,28 @@ PointXYZRGB Utils::transformPoint(PointXYZRGB point, Mat_<float> matrix) {
 
 	return output;
 }
+
+vector<PointXYZ> Utils::transformPoints(vector<Point2f> points, Mat matrix)
+{
+	Point2f centroid = calculateCentroid(points);
+	vector<PointXYZ> output;
+	for (int i=0; i<points.size(); i++)
+	{
+		points[i] -= centroid;
+		Mat_<double> point = Mat(4,1,CV_64F);
+		point(0)=points[i].x;
+		point(1)=points[i].y;
+		point(2)=0;
+		point(3)=1;
+
+		Mat_<double> transformed = matrix * point;
+		output.push_back(PointXYZ(transformed(0),transformed(1),transformed(2)));
+	}
+	return output;
+}
+
+void Utils::out(vector<PointXYZ> vector)
+{
+	for(int i=0; i<vector.size(); i++)
+		cout<<vector[i]<<endl;
+}

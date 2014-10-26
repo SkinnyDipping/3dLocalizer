@@ -17,21 +17,21 @@ TransformationMatrix::~TransformationMatrix() {
 }
 
 Mat TransformationMatrix::combineMatrix(PointXYZ targetPoint, Quaternion qtrn,
-		PointXYZ scaleFactor) {
+		Mat_<double> scaleMatrix) {
 	Mat_<double> rotation = qtrn.toTransformationMatrix();
-	Mat_<double> scale = Mat::eye(4, 4, CV_64F);
+//	Mat_<double> scale = Mat::eye(4, 4, CV_64F);
 	Mat_<double> translate = Mat::eye(4, 4, CV_64F);
 	Mat_<double> qtrnMat = qtrn.toTransformationMatrix();
 
-	scale(0, 0) = scaleFactor.x;
-	scale(1, 1) = scaleFactor.y;
-	scale(2, 2) = scaleFactor.z;
+//	scale(0, 0) = scaleFactor.x;
+//	scale(1, 1) = scaleFactor.y;
+//	scale(2, 2) = scaleFactor.z;
 
 	translate(0, 3) = targetPoint.x;
 	translate(1, 3) = targetPoint.y;
 	translate(2, 3) = targetPoint.z;
 
-	Mat temp = translate * scale;
+	Mat temp = translate * scaleMatrix;
 	return (temp * rotation);
 }
 

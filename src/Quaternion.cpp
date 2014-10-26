@@ -130,12 +130,12 @@ Mat_<double> Quaternion::toTransformationMatrix() {
 }
 
 PointXYZ Quaternion::rotate(PointXYZ point, Quaternion q,
-		PointXYZ finalCentroid) {
+		PointXYZ rotationCenter) {
 
 	//Translation to center
-//	point.x -= rotationCenter.x;
-//	point.y -= rotationCenter.y;
-//	point.z -= rotationCenter.z;
+	point.x -= rotationCenter.x;
+	point.y -= rotationCenter.y;
+	point.z -= rotationCenter.z;
 
 	//Rotation
 	Quaternion v = Quaternion(0, point.x, point.y, point.z);
@@ -143,8 +143,8 @@ PointXYZ Quaternion::rotate(PointXYZ point, Quaternion q,
 	Quaternion rotated = (q * v) * temp;
 
 	//Reverse translation
-	return PointXYZ(rotated.x + finalCentroid.x, rotated.y + finalCentroid.y,
-			rotated.z + finalCentroid.z);
+	return PointXYZ(rotated.x + rotationCenter.x, rotated.y + rotationCenter.y,
+			rotated.z + rotationCenter.z);
 }
 
 vector<PointXYZ> Quaternion::rotate(vector<PointXYZ> points, Quaternion q,

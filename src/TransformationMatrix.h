@@ -22,7 +22,7 @@ public:
 	virtual ~TransformationMatrix();
 
 	static Mat combineMatrix(PointXYZ targetPoint, Quaternion qtrn,
-			PointXYZ scaleFactor = PointXYZ(1, 1, 1));
+			Mat_<double> scaleMatrix = Mat::eye(4,4,CV_64F));
 	Mat calculateTransformationMatrix(vector<PointXYZ> imagePoints,
 			vector<PointXYZ> cloudPoints);
 };

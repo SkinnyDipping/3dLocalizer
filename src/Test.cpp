@@ -25,6 +25,7 @@ void out(vector<PointXYZ> v) {
 }
 
 int main() {
+	cout << "TEST MAIN SOURCE CODE\n";
 	Caster cast = Caster();
 
 //	cast.centerSphere = PointXYZ(0, -2, -7);
@@ -54,11 +55,27 @@ int main() {
 //	Point2f C2 = Point2f(-5,35);
 //	Point2f D2 = Point2f(14,33);
 //	Point2f E2 = Point2f(-9,41);
-	Point2f A2 = Point2f(21.2132,5.6568);
-	Point2f B2 = Point2f(-12.7279,-14.1421);
-	Point2f C2 = Point2f(-0.7071,-6.3639);
-	Point2f D2 = Point2f(7.0711,12.7279);
-	Point2f E2 = Point2f(-14.8492,2.1213);
+//	Point2f A2 = Point2f(39,18);
+//	Point2f B2 = Point2f(1,28);
+//	Point2f C2 = Point2f(15,35);
+//	Point2f D2 = Point2f(34,33);
+//	Point2f E2 = Point2f(11,41);
+//	Point2f A2 = Point2f(21.2132,5.6568);
+//	Point2f B2 = Point2f(-12.7279,-14.1421);
+//	Point2f C2 = Point2f(-0.7071,-6.3639);
+//	Point2f D2 = Point2f(7.0711,12.7279);
+//	Point2f E2 = Point2f(-14.8492,2.1213);
+//	Point2f A2 = Point2f(32.3, -15.1);
+//	Point2f B2 = Point2f(-32.3, 1.9);
+//	Point2f C2 = Point2f(-8.5, 13.8);
+//	Point2f D2 = Point2f(23.8, 10.4);
+//	Point2f E2 = Point2f(-15.3, 24);
+	Point2f A2 = Point2f(19.45,4.3);
+	Point2f B2 = Point2f(-18.45,-6.04);
+	Point2f C2 = Point2f(-9.83,7.03);
+	Point2f D2 = Point2f(7.62,14.79);
+	Point2f E2 = Point2f(-16.29,10.22);
+
 	vector<Point2f> v3;
 	v3.push_back(A2);
 	v3.push_back(B2);
@@ -66,8 +83,17 @@ int main() {
 	v3.push_back(D2);
 	v3.push_back(E2);
 
-//	cast.cloudToImage(v,v3);
-	cerr << cast.cloudToImage(v, v3) << endl;
+	Mat_<double> matrix = cast.cloudToImage(v, v3);
+//	cout << matrix << endl;
+//	Utils::out(Utils::transformPoints(v3, matrix));
+
+	Quaternion q = Quaternion(DEG2RAD(30), PointXYZ(0, 1, 0));
+	q.out();
+	cout << Quaternion::rotate(PointXYZ(19, 24, 6), q,PointXYZ(0,24,-7)) << endl;
+	cout << Quaternion::rotate(PointXYZ(-19, 24,-4), q,PointXYZ(0,24,-7) )<< endl;
+	cout << Quaternion::rotate(PointXYZ(-5, 24, -11), q,PointXYZ(0,24,-7)) << endl;
+	cout << Quaternion::rotate(PointXYZ(14,24, -9), q, PointXYZ(0,24,-7))<< endl;
+	cout << Quaternion::rotate(PointXYZ(-9, 24,-17), q,PointXYZ(0,24,-7)) << endl;
 
 //	PointXYZ p = PointXYZ(0,0,0);
 //	PointXYZ p2=PointXYZ(2,2,0);

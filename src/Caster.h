@@ -36,7 +36,7 @@ public:
 
 	PointXYZ tangentialPoint;
 	Quaternion quaternion;
-	PointXYZ scaleFactor;
+	Mat scaleMatrix;
 	double minMSE;
 
 	bool cloudCasted, imageCasted;
@@ -98,7 +98,7 @@ private:
 	double distance(PointXYZ p1, PointXYZ p2);
 
 
-	PointXYZ determineScale(PointXYZ initialPoint, PointXYZ finalPoint);
+	Mat determineScale(PointXYZ initialPoint, PointXYZ finalPoint, PointXYZ centroid = PointXYZ(0,0,0));
 	void out(vector<PointXYZ> v);	//TEMP
 
 };
