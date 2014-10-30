@@ -24,6 +24,11 @@ void out(vector<PointXYZ> v) {
 		cout << v[i].x << "\t" << v[i].y << "\t" << v[i].z << endl;
 }
 
+void out(vector<Point2f> v) {
+	for (int i = 0; i < v.size(); i++)
+		cout << v[i].x << "\t" << v[i].y<< endl;
+}
+
 int main() {
 	cout << "TEST MAIN SOURCE CODE\n";
 	Caster cast = Caster();
@@ -50,32 +55,57 @@ int main() {
 	v.push_back(D);
 	v.push_back(E);
 
-//	Point2f A2 = Point2f(19,18);
-//	Point2f B2 = Point2f(-19,28);
-//	Point2f C2 = Point2f(-5,35);
-//	Point2f D2 = Point2f(14,33);
-//	Point2f E2 = Point2f(-9,41);
-//	Point2f A2 = Point2f(39,18);
-//	Point2f B2 = Point2f(1,28);
-//	Point2f C2 = Point2f(15,35);
-//	Point2f D2 = Point2f(34,33);
-//	Point2f E2 = Point2f(11,41);
-//	Point2f A2 = Point2f(21.2132,5.6568);
-//	Point2f B2 = Point2f(-12.7279,-14.1421);
-//	Point2f C2 = Point2f(-0.7071,-6.3639);
-//	Point2f D2 = Point2f(7.0711,12.7279);
-//	Point2f E2 = Point2f(-14.8492,2.1213);
-//	Point2f A2 = Point2f(32.3, -15.1);
-//	Point2f B2 = Point2f(-32.3, 1.9);
-//	Point2f C2 = Point2f(-8.5, 13.8);
-//	Point2f D2 = Point2f(23.8, 10.4);
-//	Point2f E2 = Point2f(-15.3, 24);
+#define TEST1
+//#define TEST2
+//#define TEST3
+//#define TEST4
+//#define TEST5
+
+#ifdef TEST1
+	Point2f A2 = Point2f(19,6);
+	Point2f B2 = Point2f(-19,-4);
+	Point2f C2 = Point2f(-5,-11);
+	Point2f D2 = Point2f(14,-9);
+	Point2f E2 = Point2f(-9,-17);
+#endif
+#ifdef TEST2
+	Point2f A2 = Point2f(39,18);
+	Point2f B2 = Point2f(1,28);
+	Point2f C2 = Point2f(15,35);
+	Point2f D2 = Point2f(34,33);
+	Point2f E2 = Point2f(11,41);
+#endif
+#ifdef TEST3
+	Point2f A2 = Point2f(32.3, -15.1);
+	Point2f B2 = Point2f(-32.3, 1.9);
+	Point2f C2 = Point2f(-8.5, 13.8);
+	Point2f D2 = Point2f(23.8, 10.4);
+	Point2f E2 = Point2f(-15.3, 24);
+#endif
+#ifdef TEST4
+//	Point2f A2 = Point2f(22.95,5.24);
+//	Point2f B2 = Point2f(-14.95,-5.10);
+//	Point2f C2 = Point2f(6.33,7.96);
+//	Point2f D2 = Point2f(11.12,15.73);
+//	Point2f E2 = Point2f(-12.79,11.16);
 	Point2f A2 = Point2f(19.45,4.3);
 	Point2f B2 = Point2f(-18.45,-6.04);
 	Point2f C2 = Point2f(-9.83,7.03);
 	Point2f D2 = Point2f(7.62,14.79);
 	Point2f E2 = Point2f(-16.29,10.22);
-
+#endif
+#ifdef TEST5
+//	Point2f A2 = Point2f(39.02,4.01);
+//	Point2f B2 = Point2f(-25.42,-13.57);
+//	Point2f C2 = Point2f(-10.76,8.64);
+//	Point2f D2 = Point2f(18.91,21.84);
+//	Point2f E2 = Point2f(-21.75,14.07);
+	Point2f A2 = Point2f(20.34,29.18);
+	Point2f B2 = Point2f(-27.02,-17.79);
+	Point2f C2 = Point2f(-.46,-16.2);
+	Point2f D2 = Point2f(25.81,2.89);
+	Point2f E2 = Point2f(1.25,-28.43);
+#endif
 	vector<Point2f> v3;
 	v3.push_back(A2);
 	v3.push_back(B2);
@@ -84,16 +114,40 @@ int main() {
 	v3.push_back(E2);
 
 	Mat_<double> matrix = cast.cloudToImage(v, v3);
-//	cout << matrix << endl;
-//	Utils::out(Utils::transformPoints(v3, matrix));
+	cout << matrix << endl;
+	Utils::out(Utils::transformPoints(v3, matrix));
 
-	Quaternion q = Quaternion(DEG2RAD(30), PointXYZ(0, 1, 0));
+//	Quaternion q = Quaternion(DEG2RAD(30), PointXYZ(0, 1, 0));
+//	q.out();
+//	cout << Quaternion::rotate(PointXYZ(32.3, 24, 15.1), q,PointXYZ(0,24,-7)) << endl;
+//	cout << Quaternion::rotate(PointXYZ(-32.3, 24,-1.9), q,PointXYZ(0,24,-7) )<< endl;
+//	cout << Quaternion::rotate(PointXYZ(-8.5, 24, -13.8), q,PointXYZ(0,24,-7)) << endl;
+//	cout << Quaternion::rotate(PointXYZ(23.8,24, -10.4), q, PointXYZ(0,24,-7))<< endl;
+//	cout << Quaternion::rotate(PointXYZ(-15.3, 24,-24), q,PointXYZ(0,24,-7)) << endl;
+
+//	PointXYZ A = PointXYZ(19, -13, 6);
+//	PointXYZ B = PointXYZ(-19, 10, -4);
+//	PointXYZ C = PointXYZ(-5, -20, -11);
+//	PointXYZ D = PointXYZ(14, 4, -9);
+//	PointXYZ E = PointXYZ(-9, 9, -17);
+
+	PointXYZ Ar = PointXYZ(19, -13,0);
+	PointXYZ Br = PointXYZ(-19, 10, 0);
+	PointXYZ Cr = PointXYZ(-5, -20, 0);
+	PointXYZ Dr = PointXYZ(14, 4, 0);
+	PointXYZ Er = PointXYZ(-9, 9, 0);
+
+	vector<PointXYZ> v2;
+	v2.push_back(Ar);
+	v2.push_back(Br);
+	v2.push_back(Cr);
+	v2.push_back(Dr);
+	v2.push_back(Er);
+
+
+	Quaternion q = Quaternion(DEG2RAD(30),PointXYZ(0,0,-1));
 	q.out();
-	cout << Quaternion::rotate(PointXYZ(19, 24, 6), q,PointXYZ(0,24,-7)) << endl;
-	cout << Quaternion::rotate(PointXYZ(-19, 24,-4), q,PointXYZ(0,24,-7) )<< endl;
-	cout << Quaternion::rotate(PointXYZ(-5, 24, -11), q,PointXYZ(0,24,-7)) << endl;
-	cout << Quaternion::rotate(PointXYZ(14,24, -9), q, PointXYZ(0,24,-7))<< endl;
-	cout << Quaternion::rotate(PointXYZ(-9, 24,-17), q,PointXYZ(0,24,-7)) << endl;
+	out(Quaternion::rotate(v3,q,Point2f(3,-2)));
 
 //	PointXYZ p = PointXYZ(0,0,0);
 //	PointXYZ p2=PointXYZ(2,2,0);

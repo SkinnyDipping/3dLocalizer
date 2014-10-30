@@ -15,6 +15,10 @@ void Caster::out(vector<PointXYZ> v) {
 		cout << v[i].x << "\t" << v[i].y << "\t" << v[i].z << endl;
 }
 
+std::ostream& operator<<(std::ostream &out, const Quaternion &q) {
+	return out<<"<"<<q.w<<", "<<q.x<<", "<<q.y<<", "<<q.z<<">";
+}
+
 Caster::Caster() {
 	A = 1;
 	B = 3;
@@ -69,7 +73,7 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 
 	calculateTangentialPlaneCoeff();
 
-	cout << "imagePoints:\n" << imagePoints << endl;
+	cout << "centered imagePoints:\n" << imagePoints << endl;
 	cout << "cloud point:\n";Utils::out(cloudPoints);
 
 	vector<PointXYZ> castedImage = imageOnPlane(this->A, this->B, this->C,
@@ -101,13 +105,17 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 
 	cout<<"Angle: "<<RAD2DEG(angle)<<endl;
 
-	//Rotating castedCloud points
+	//Rotating castedImage points
 	vector<PointXYZ> rotatedPoints;
 	PointXYZ vector = Utils::normalizeVector(
 			PointXYZ(this->A, this->B, this->C));
 
-	Quaternion qtrn = Quaternion(angle, vector);
-	qtrn.out();
+	Quaternion qtrn = Quaternion(-angle, vector);
+	cout<<"Cast quaternion: "<<this->quaternion<<endl;
+	cout<<"Rotation q: "<<qtrn<<endl;
+	cout<<"Combined quaternion: "<<this->quaternion*qtrn<<endl;
+	this->quaternion = this->quaternion * qtrn;
+	cout<<this->quaternion<<endl;
 
 	//Actual rotation
 	rotatedPoints = Quaternion::rotate(castedImage, qtrn, tangentialPoint);
@@ -117,15 +125,17 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 	cout<<"Rotated Points:\n";
 	Utils::out(rotatedPoints);
 
+	cout<<"Cloud point: "<<castedCloud[referenceIdx]<<"\nCasted image: "<<castedImage[referenceIdx]<<"\nRotated point: "<<rotatedPoints[referenceIdx];
+
 	//Scale and scaling
-	Mat_<double> scaleMatrix = determineScale(castedImage[referenceIdx],
+	Mat_<double> scaleMatrix = determineScale(castedCloud[referenceIdx],
 			rotatedPoints[referenceIdx],tangentialPoint);
 	for (int i = 0; i < castedImage.size(); i++) {
 				castedImage[i]=Utils::add(castedImage[i], PointXYZ(-tangentialPoint.x, -tangentialPoint.y, -tangentialPoint.z));
 				castedImage[i]=Utils::transformPoint(castedImage[i],scaleMatrix);
 				castedImage[i]=Utils::add(castedImage[i],tangentialPoint);
 			}
-	cout << "SCALE: " << scaleMatrix<<endl;
+	cout << "\nSCALE: " << scaleMatrix<<endl;
 	this->scaleMatrix=scaleMatrix;
 #ifdef ALL_POINTS
 	//Calculating MSE
@@ -230,9 +240,9 @@ double Caster::MSE(vector<PointXYZ> set1, vector<PointXYZ> set2) {
 Mat Caster::determineScale(PointXYZ initialPoint, PointXYZ finalPoint,
 		PointXYZ centroid) {
 #define INF (1.0/0.0)
-	double sx = (finalPoint.x - centroid.x) / (initialPoint.x - centroid.x);
-	double sy = (finalPoint.y - centroid.y) / (initialPoint.y - centroid.y);
-	double sz = (finalPoint.z - centroid.z) / (initialPoint.z - centroid.z);
+	double sx = (initialPoint.x - centroid.x) / (finalPoint.x - centroid.x);
+	double sy = (initialPoint.y - centroid.y) / (finalPoint.y - centroid.y);
+	double sz = (initialPoint.z - centroid.z) / (finalPoint.z - centroid.z);
 	if (sx != sx||sx==INF)
 		sx = 1;
 	if (sy != sy||sy==INF)

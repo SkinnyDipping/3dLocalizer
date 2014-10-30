@@ -8,6 +8,8 @@
 #ifndef QUATERNION_H_
 #define QUATERNION_H_
 
+#include <ostream>
+
 #include "pcl/point_types.h"
 #include "opencv2/opencv.hpp"
 #include "Utils.h"
@@ -17,7 +19,7 @@ using namespace cv;
 
 class Quaternion {
 
-private:
+public:
 	double w,x,y,z;
 
 public:
@@ -30,7 +32,7 @@ public:
 	//		this->z = z;
 	//	}
 
-		Quaternion(double angle, PointXYZ vector);
+		Quaternion(double angle, PointXYZ vector=PointXYZ(0,0,1));
 		Quaternion(double w,double x,double y,double z);
 
 	//	Quaternion(double angle, vector<double> vector) {
@@ -40,6 +42,7 @@ public:
 
 		void normalize();
 		Quaternion operator*(Quaternion& q);
+
 		Quaternion inv();
 		Quaternion conj();
 		double norm();
@@ -51,7 +54,9 @@ public:
 		Mat_<double> toTransformationMatrix();
 
 		static PointXYZ rotate(PointXYZ point, Quaternion q, PointXYZ rotationPoint=PointXYZ(0,0,0));
-		static vector<PointXYZ> rotate(vector<PointXYZ> point, Quaternion q, PointXYZ rotationPoint=PointXYZ(0,0,0));
+		static Point2f rotate(Point2f point, Quaternion q, Point2f rotationPoint=Point2f(0,0));
+		static vector<PointXYZ> rotate(vector<PointXYZ> point, Quaternion q, PointXYZ rotationCenter=PointXYZ(0,0,0));
+		static vector<Point2f> rotate(vector<Point2f> points, Quaternion q, Point2f rotationCenter=Point2f(0,0));
 
 };
 

@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <iostream>
+#include <ostream>
 #include "pcl/point_types.h"
 #include "pcl/io/io.h"
 #include "opencv2/opencv.hpp"

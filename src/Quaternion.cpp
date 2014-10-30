@@ -8,11 +8,11 @@
 #include "Quaternion.h"
 
 Quaternion::Quaternion() {
-	this->w = 0;
+	this->w = 1;
 	this->x = 0;
 	this->y = 0;
 	this->z = 0;
-
+	normalize();
 }
 
 Quaternion::~Quaternion() {
@@ -26,6 +26,7 @@ Quaternion::Quaternion(double angle, PointXYZ vector) {
 	this->x = vector.x * sinus;
 	this->y = vector.y * sinus;
 	this->z = vector.z * sinus;
+	normalize();
 }
 
 Quaternion::Quaternion(double w, double x, double y, double z) {
@@ -33,6 +34,7 @@ Quaternion::Quaternion(double w, double x, double y, double z) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
+	normalize();
 }
 
 void Quaternion::normalize() {
@@ -148,14 +150,14 @@ PointXYZ Quaternion::rotate(PointXYZ point, Quaternion q,
 }
 
 vector<PointXYZ> Quaternion::rotate(vector<PointXYZ> points, Quaternion q,
-		PointXYZ finalCentroid) {
+		PointXYZ rotationCenter) {
 
 	PointXYZ centroid = Utils::calculateCentroid(points);//cout<<"Centroid "<<centroid<<endl;
 	for (int i = 0; i < points.size(); i++) {
-		//Translation to center
-		points[i].x -= centroid.x;
-		points[i].y -= centroid.y;
-		points[i].z -= centroid.z;
+		//Translation to origin
+		points[i].x -= rotationCenter.x;
+		points[i].y -= rotationCenter.y;
+		points[i].z -= rotationCenter.z;
 //cout<<"Points "<<points[i]<<endl;
 		//Rotation
 		Quaternion v = Quaternion(0, points[i].x, points[i].y, points[i].z);
@@ -163,9 +165,33 @@ vector<PointXYZ> Quaternion::rotate(vector<PointXYZ> points, Quaternion q,
 		Quaternion rotated = (q * v) * temp;
 //v.out();(q*v).out();temp.out();
 //rotated.out();
-		points[i].x = rotated.x+finalCentroid.x;
-		points[i].y = rotated.y+finalCentroid.y;
-		points[i].z = rotated.z+finalCentroid.z;
+		points[i].x = rotated.x+rotationCenter.x;
+		points[i].y = rotated.y+rotationCenter.y;
+		points[i].z = rotated.z+rotationCenter.z;
+//cout<<points[i]<<endl;
+	}
+
+	//Reverse translation
+	return points;
+}
+
+vector<Point2f> Quaternion::rotate(vector<Point2f> points, Quaternion q,
+		Point2f rotationCenter) {
+
+	for (int i = 0; i < points.size(); i++) {
+		//Translation to origin
+		points[i].x -= rotationCenter.x;
+		points[i].y -= rotationCenter.y;
+//cout<<"Points "<<points[i]<<endl;
+		//Rotation
+		Quaternion v = Quaternion(0, points[i].x, points[i].y, 0);
+		Quaternion temp = q.inv();
+//		Quaternion rotated = (q * v) * temp;
+		Quaternion rotated = (temp*v)*q;
+//v.out();(q*v).out();temp.out();
+//rotated.out();
+		points[i].x = rotated.x+rotationCenter.x;
+		points[i].y = rotated.y+rotationCenter.y;
 //cout<<points[i]<<endl;
 	}
 
