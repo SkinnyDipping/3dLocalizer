@@ -26,7 +26,6 @@ Quaternion::Quaternion(double angle, PointXYZ vector) {
 	this->x = vector.x * sinus;
 	this->y = vector.y * sinus;
 	this->z = vector.z * sinus;
-	normalize();
 }
 
 Quaternion::Quaternion(double w, double x, double y, double z) {
@@ -34,15 +33,14 @@ Quaternion::Quaternion(double w, double x, double y, double z) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
-	normalize();
 }
 
 void Quaternion::normalize() {
 	double M = sqrt(w * w + x * x + y * y + z * z);
-	x = x / M;
-	y = y / M;
-	z = z / M;
-	w = w / M;
+	this->x = x / M;
+	this->y = y / M;
+	this->z = z / M;
+	this->w = w / M;
 }
 
 Quaternion Quaternion::conj() {
@@ -149,52 +147,75 @@ PointXYZ Quaternion::rotate(PointXYZ point, Quaternion q,
 			rotated.z + rotationCenter.z);
 }
 
-vector<PointXYZ> Quaternion::rotate(vector<PointXYZ> points, Quaternion q,
+//vector<PointXYZ> Quaternion::rotate(vector<PointXYZ> points, Quaternion q,
+		//PointXYZ rotationCenter) {
+//
+	////cout << "\nQUATERNION ROTATE\n";
+	//for (int i = 0; i < points.size(); i++) {
+////cout<<"\nPoint: "<<points[i]<<endl;
+		////Translation to origin
+		//points[i].x -= rotationCenter.x;
+		//points[i].y -= rotationCenter.y;
+		//points[i].z -= rotationCenter.z;
+////cout<<"Translated to origin: "<<points[i]<<endl;
+////cout<<"Points "<<points[i]<<endl;
+		////Rotation
+		//Quaternion v = Quaternion(0, points[i].x, points[i].y, points[i].z);
+		//Quaternion temp = q.inv();
+		//Quaternion rotated = (q * v) * temp;
+////v.out();(q*v).out();temp.out();
+////rotated.out();
+		//points[i].x = rotated.x+rotationCenter.x;
+		//points[i].y = rotated.y+rotationCenter.y19,;
+		//points[i].z = rotated.z+rotationCenter.z;
+////cout<<"Rotated and back to origin: "<<points[i]<<endl;
+////cout<<points[i]<<endl;
+	//}
+//
+	////Reverse translation
+	//return points;
+//}
+
+vector<PointXYZ> Quaternion::rotate(vector<PointXYZ> points, Quaternion q, PointXYZ rotationCenter) {
+	
+	Mat_<double> point = Mat::zeros(4,1,CV_64F);
+	Mat_<double> center = Mat::zeros(4,1,CV_64F);
+	Mat rotationMatrix = q.toTransformationMatrix();
+
+	center(0) = rotationCenter.x;
+	center(1) = rotationCenter.y;
+	center(2) = rotationCenter.z;
+	center(3) = 1;
+
+	//cout << "\nQUATERNION ROTATE\n";
+	//cout<<"rotation center:\n"<<center<<endl;
+//cout<<"rotation matrix:\n"<<rotationMatrix<<endl;
+
+	for (int i=0; i<points.size(); i++) {
+		point(0) = points[i].x;
+		point(1) = points[i].y;
+		point(2) = points[i].z;
+
+		point -= center;
+		point(3) = 1;
+//cout<<"point:\n"<<point<<endl;
+		point = rotationMatrix * point;
+//cout << "rotated point:\n"<<point<<endl;
+		point += center;
+
+		points[i].x = point(0);
+		points[i].y = point(1);
+		points[i].z = point(2);
+	}
+	//cout<<"QUATERNION END"<<endl<<endl;
+	return points;
+}	
+
+vector<PointXYZ> Quaternion::rotate(vector<Point2f> points, Quaternion q,
 		PointXYZ rotationCenter) {
-
-	PointXYZ centroid = Utils::calculateCentroid(points);//cout<<"Centroid "<<centroid<<endl;
-	for (int i = 0; i < points.size(); i++) {
-		//Translation to origin
-		points[i].x -= rotationCenter.x;
-		points[i].y -= rotationCenter.y;
-		points[i].z -= rotationCenter.z;
-//cout<<"Points "<<points[i]<<endl;
-		//Rotation
-		Quaternion v = Quaternion(0, points[i].x, points[i].y, points[i].z);
-		Quaternion temp = q.inv();
-		Quaternion rotated = (q * v) * temp;
-//v.out();(q*v).out();temp.out();
-//rotated.out();
-		points[i].x = rotated.x+rotationCenter.x;
-		points[i].y = rotated.y+rotationCenter.y;
-		points[i].z = rotated.z+rotationCenter.z;
-//cout<<points[i]<<endl;
+	vector<PointXYZ> dPoints;
+	for (int i=0; i<points.size(); i++) {
+		dPoints.push_back(PointXYZ(points[i].x, points[i].y, 0));	
 	}
-
-	//Reverse translation
-	return points;
-}
-
-vector<Point2f> Quaternion::rotate(vector<Point2f> points, Quaternion q,
-		Point2f rotationCenter) {
-
-	for (int i = 0; i < points.size(); i++) {
-		//Translation to origin
-		points[i].x -= rotationCenter.x;
-		points[i].y -= rotationCenter.y;
-//cout<<"Points "<<points[i]<<endl;
-		//Rotation
-		Quaternion v = Quaternion(0, points[i].x, points[i].y, 0);
-		Quaternion temp = q.inv();
-//		Quaternion rotated = (q * v) * temp;
-		Quaternion rotated = (temp*v)*q;
-//v.out();(q*v).out();temp.out();
-//rotated.out();
-		points[i].x = rotated.x+rotationCenter.x;
-		points[i].y = rotated.y+rotationCenter.y;
-//cout<<points[i]<<endl;
-	}
-
-	//Reverse translation
-	return points;
+	return rotate(dPoints, q, rotationCenter);
 }

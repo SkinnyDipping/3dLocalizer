@@ -56,7 +56,7 @@ public:
 		static PointXYZ rotate(PointXYZ point, Quaternion q, PointXYZ rotationPoint=PointXYZ(0,0,0));
 		static Point2f rotate(Point2f point, Quaternion q, Point2f rotationPoint=Point2f(0,0));
 		static vector<PointXYZ> rotate(vector<PointXYZ> point, Quaternion q, PointXYZ rotationCenter=PointXYZ(0,0,0));
-		static vector<Point2f> rotate(vector<Point2f> points, Quaternion q, Point2f rotationCenter=Point2f(0,0));
+		static vector<PointXYZ> rotate(vector<Point2f> points, Quaternion q, PointXYZ rotationCenter=PointXYZ(0,0,0));
 
 };
 
