@@ -29,6 +29,7 @@ public:
 
 	static PointXYZ transformPoint(PointXYZ point, Mat_<float> matrix);
 	static PointXYZRGB transformPoint(PointXYZRGB point, Mat_<float> matrix);
+	static PointXYZ transformPoint(Point2f point, Mat matrix, Point2f centroid);
 	static vector<PointXYZ> transformPoints(vector<Point2f>, Mat matrix);
 
 	static void out(vector<PointXYZ> vector);

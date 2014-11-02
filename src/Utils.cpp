@@ -103,6 +103,19 @@ PointXYZRGB Utils::transformPoint(PointXYZRGB point, Mat_<float> matrix) {
 	return output;
 }
 
+PointXYZ Utils::transformPoint(Point2f point, Mat matrix, Point2f centroid)
+{
+		point -= centroid;
+		Mat_<double> mPoint = Mat(4,1,CV_64F);
+		mPoint(0)=point.x;
+		mPoint(1)=point.y;
+		mPoint(2)=0;
+		mPoint(3)=1;
+
+		Mat_<double> transformed = matrix * mPoint;
+		return PointXYZ(transformed(0),transformed(1),transformed(2));
+}
+
 vector<PointXYZ> Utils::transformPoints(vector<Point2f> points, Mat matrix)
 {
 	Point2f centroid = calculateCentroid(points);

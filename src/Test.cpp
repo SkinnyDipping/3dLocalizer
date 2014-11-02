@@ -48,11 +48,19 @@ int main() {
 //	cast.tangentialPoint = PointXYZ(0, 24, -7);
 #endif
 
-	PointXYZ A = PointXYZ(19, -13, 6);
-	PointXYZ B = PointXYZ(-19, 10, -4);
-	PointXYZ C = PointXYZ(-5, -20, -11);
-	PointXYZ D = PointXYZ(14, 4, -9);
-	PointXYZ E = PointXYZ(-9, 9, -17);
+//	PointXYZ A = PointXYZ(19, -13, 6);
+//	PointXYZ B = PointXYZ(-19, 10, -4);
+//	PointXYZ C = PointXYZ(-5, -20, -11);
+//	PointXYZ D = PointXYZ(14, 4, -9);
+//	PointXYZ E = PointXYZ(-9, 9, -17);
+	PointXYZ A = PointXYZ(0.5614,6.7578,132.139);
+	PointXYZ B = PointXYZ(-0.0762,6.4742,132.4927);
+	PointXYZ C = PointXYZ(-0.8509,6.1495,133.216);
+	PointXYZ D = PointXYZ(0.057,6.5415,133.2182);
+	PointXYZ E = PointXYZ(-0.7907,6.1947,131.0959);
+	PointXYZ F = PointXYZ(-0.0135,6.5007,131.095);
+	PointXYZ G = PointXYZ(-1.7732,5.7418,133.107);
+	PointXYZ H = PointXYZ(-1.7754,5.7539,132.413);
 //	cast.calculateTangentialPlaneCoeff();
 	vector<PointXYZ> v;
 	v.push_back(A);
@@ -60,6 +68,9 @@ int main() {
 	v.push_back(C);
 	v.push_back(D);
 	v.push_back(E);
+	v.push_back(F);
+	v.push_back(G);
+	v.push_back(H);
 
 //#define TEST1
 //#define TEST2
@@ -67,7 +78,8 @@ int main() {
 //#define TEST4
 //#define TEST5
 //#define TEST6
-#define TEST7
+//#define TEST7
+#define ACTUAL_POINTS
 
 #ifdef TEST1
 	Point2f A2 = Point2f(19,-13);
@@ -129,18 +141,33 @@ int main() {
 	Point2f D2 = Point2f(17.06172, 6.84834);
 	Point2f E2 = Point2f(-3.63250, -17.10839);
 #endif
+#ifdef ACTUAL_POINTS
+	Point2f A2 = Point2f(497,230);
+	Point2f B2 = Point2f(440,196);
+	Point2f C2 = Point2f(367,127);
+	Point2f D2 = Point2f(454,131);
+	Point2f E2 = Point2f(368,323);
+	Point2f F2 = Point2f(443,322);
+	Point2f G2 = Point2f(271,131);
+	Point2f H2 = Point2f(270,198);
+#endif
 	vector<Point2f> v3;
 	v3.push_back(A2);
 	v3.push_back(B2);
 	v3.push_back(C2);
 	v3.push_back(D2);
 	v3.push_back(E2);
+#ifdef ACTUAL_POINTS
+	v3.push_back(F2);
+	v3.push_back(G2);
+	v3.push_back(H2);
+#endif
 
-	Mat_<double> matrix = cast.cloudToImage(v, v3);
-	cout <<"\nTHE RESULT:\n"<< matrix << endl;
-	cout << "Cloud:\n";out(v);
-	cout << "Transformed image:\n";
-	Utils::out(Utils::transformPoints(v3, matrix));
+//	Mat_<double> matrix = cast.cloudToImage(v, v3);
+//	cout <<"\nTHE RESULT:\n"<< matrix << endl;
+//	cout << "Cloud:\n";out(v);
+//	cout << "Transformed image:\n";
+//	Utils::out(Utils::transformPoints(v3, matrix));
 
 //	Quaternion q = Quaternion(DEG2RAD(30), PointXYZ(0, 1, 0));
 //	q.out();
@@ -156,11 +183,11 @@ int main() {
 //	PointXYZ Dr = PointXYZ(14, 4, -9);
 //	PointXYZ Er = PointXYZ(-9, 9, -17);
 
-//	PointXYZ Ar = PointXYZ(19,-13,0);
-//	PointXYZ Br = PointXYZ(-19,-3,0);
-//	PointXYZ Cr = PointXYZ(-5,4,0);
-//	PointXYZ Dr = PointXYZ(14, 2, 0);
-//	PointXYZ Er = PointXYZ(-9,10,0);
+	PointXYZ Ar = PointXYZ(19,-13,0);
+	PointXYZ Br = PointXYZ(-19,-3,0);
+	PointXYZ Cr = PointXYZ(-5,4,0);
+	PointXYZ Dr = PointXYZ(14, 2, 0);
+	PointXYZ Er = PointXYZ(-9,10,0);
 
 //	PointXYZ Ar = PointXYZ(18.6427,24,-15.511);
 //	PointXYZ Br = PointXYZ(-9.27182,24,12.1315);
@@ -174,11 +201,11 @@ int main() {
 //	PointXYZ Dr = PointXYZ(14, 0, 2);
 //	PointXYZ Er = PointXYZ(-9, 0, 10);
 
-	PointXYZ Ar = PointXYZ(9.95448,0,-20.7583);
-	PointXYZ Br = PointXYZ(-17.9545,0,6.90192);
-	PointXYZ Cr = PointXYZ(-2.33013,0,5.9641);
-	PointXYZ Dr = PointXYZ(13.1244,0,-5.26795);
-	PointXYZ Er = PointXYZ(-2.79423,0,13.1603);
+//	PointXYZ Ar = PointXYZ(9.95448,0,-20.7583);
+//	PointXYZ Br = PointXYZ(-17.9545,0,6.90192);
+//	PointXYZ Cr = PointXYZ(-2.33013,0,5.9641);
+//	PointXYZ Dr = PointXYZ(13.1244,0,-5.26795);
+//	PointXYZ Er = PointXYZ(-2.79423,0,13.1603);
 
 
 	vector<PointXYZ> v2;
@@ -189,10 +216,13 @@ int main() {
 	v2.push_back(Er);
 
 	cout<<"QUATERNION ROTATION:\n";
-	Quaternion q = Quaternion(DEG2RAD(-30),PointXYZ(0,1,0));
-	q.out();
-	out(Quaternion::rotate(v2,q,PointXYZ(0,0,0)));
-	cout<<q.toTransformationMatrix()<<endl;
+	Quaternion q1 = Quaternion(DEG2RAD(20),PointXYZ(0,0,1));
+	Quaternion q2 = Quaternion(DEG2RAD(70),PointXYZ(0,1,0));
+	q1.out(); q2.out(); (q1*q2).out();
+	out(Quaternion::rotate(v2,q1*q2,PointXYZ(0,0,0)));
+	cout<<q1.toTransformationMatrix()*q2.toTransformationMatrix()<<endl;
+	cout<<(q1*q2).toTransformationMatrix()<<endl;
+	cout<<q1.toTransformationMatrix()*q2.toTransformationMatrix()-(q1*q2).toTransformationMatrix()<<endl;
 
 //	PointXYZ p = PointXYZ(0,0,0);
 //	PointXYZ p = PointXYZ(2,2,0);
