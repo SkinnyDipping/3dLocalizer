@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
@@ -29,6 +30,11 @@ void out(vector<Point2f> v) {
 		cout << v[i].x << "\t" << v[i].y<< endl;
 }
 
+void toFile(Quaternion q) {
+//	ifstream plik.open("/tmp/points.txt");
+//	plik.close();
+}
+
 int main() {
 	cout << "TEST MAIN SOURCE CODE\n";
 	Caster cast = Caster();
@@ -55,18 +61,20 @@ int main() {
 	v.push_back(D);
 	v.push_back(E);
 
-#define TEST1
+//#define TEST1
 //#define TEST2
 //#define TEST3
 //#define TEST4
 //#define TEST5
+//#define TEST6
+#define TEST7
 
 #ifdef TEST1
-	Point2f A2 = Point2f(19,6);
-	Point2f B2 = Point2f(-19,-4);
-	Point2f C2 = Point2f(-5,-11);
-	Point2f D2 = Point2f(14,-9);
-	Point2f E2 = Point2f(-9,-17);
+	Point2f A2 = Point2f(19,-13);
+	Point2f B2 = Point2f(-19,-3);
+	Point2f C2 = Point2f(-5,4);
+	Point2f D2 = Point2f(14,2);
+	Point2f E2 = Point2f(-9,10);
 #endif
 #ifdef TEST2
 	Point2f A2 = Point2f(39,18);
@@ -83,16 +91,16 @@ int main() {
 	Point2f E2 = Point2f(-15.3, 24);
 #endif
 #ifdef TEST4
-//	Point2f A2 = Point2f(22.95,5.24);
-//	Point2f B2 = Point2f(-14.95,-5.10);
-//	Point2f C2 = Point2f(6.33,7.96);
-//	Point2f D2 = Point2f(11.12,15.73);
-//	Point2f E2 = Point2f(-12.79,11.16);
-	Point2f A2 = Point2f(19.45,4.3);
-	Point2f B2 = Point2f(-18.45,-6.04);
-	Point2f C2 = Point2f(-9.83,7.03);
-	Point2f D2 = Point2f(7.62,14.79);
-	Point2f E2 = Point2f(-16.29,10.22);
+	Point2f A2 = Point2f(22.95,5.24);
+	Point2f B2 = Point2f(-14.95,-5.10);
+	Point2f C2 = Point2f(6.33,7.96);
+	Point2f D2 = Point2f(11.12,15.73);
+	Point2f E2 = Point2f(-12.79,11.16);
+//	Point2f A2 = Point2f(19.45,4.3);
+//	Point2f B2 = Point2f(-18.45,-6.04);
+//	Point2f C2 = Point2f(-9.83,7.03);
+//	Point2f D2 = Point2f(7.62,14.79);
+//	Point2f E2 = Point2f(-16.29,10.22);
 #endif
 #ifdef TEST5
 //	Point2f A2 = Point2f(39.02,4.01);
@@ -106,6 +114,21 @@ int main() {
 	Point2f D2 = Point2f(25.81,2.89);
 	Point2f E2 = Point2f(1.25,-28.43);
 #endif
+#ifdef TEST6
+	Point2f A2 = Point2f(9.95448,20.7583);
+	Point2f B2 = Point2f(-17.9545,-6.90192);
+	Point2f C2 = Point2f(-2.33013,-5.9641);
+	Point2f D2 = Point2f(13.1244,5.26795);
+	Point2f E2 = Point2f(-2.79423,-13.1603);
+#endif
+#ifdef TEST7
+//TUTAJ MUSIALEM ZMIENIC ZNAK. PYTANIE: DLACZEGO KURTFA?
+	Point2f A2 = Point2f(12.94082, 26.98579);
+	Point2f B2 = Point2f(-23.34085,  -8.97250);
+	Point2f C2 = Point2f(-3.02917,  -7.75333);
+	Point2f D2 = Point2f(17.06172, 6.84834);
+	Point2f E2 = Point2f(-3.63250, -17.10839);
+#endif
 	vector<Point2f> v3;
 	v3.push_back(A2);
 	v3.push_back(B2);
@@ -114,7 +137,9 @@ int main() {
 	v3.push_back(E2);
 
 	Mat_<double> matrix = cast.cloudToImage(v, v3);
-	cout << matrix << endl;
+	cout <<"\nTHE RESULT:\n"<< matrix << endl;
+	cout << "Cloud:\n";out(v);
+	cout << "Transformed image:\n";
 	Utils::out(Utils::transformPoints(v3, matrix));
 
 //	Quaternion q = Quaternion(DEG2RAD(30), PointXYZ(0, 1, 0));
@@ -125,17 +150,36 @@ int main() {
 //	cout << Quaternion::rotate(PointXYZ(23.8,24, -10.4), q, PointXYZ(0,24,-7))<< endl;
 //	cout << Quaternion::rotate(PointXYZ(-15.3, 24,-24), q,PointXYZ(0,24,-7)) << endl;
 
-//	PointXYZ A = PointXYZ(19, -13, 6);
-//	PointXYZ B = PointXYZ(-19, 10, -4);
-//	PointXYZ C = PointXYZ(-5, -20, -11);
-//	PointXYZ D = PointXYZ(14, 4, -9);
-//	PointXYZ E = PointXYZ(-9, 9, -17);
+//	PointXYZ Ar = PointXYZ(19, -13, 6);
+//	PointXYZ Br = PointXYZ(-19, 10, -4);
+//	PointXYZ Cr = PointXYZ(-5, -20, -11);
+//	PointXYZ Dr = PointXYZ(14, 4, -9);
+//	PointXYZ Er = PointXYZ(-9, 9, -17);
 
-	PointXYZ Ar = PointXYZ(19, -13,0);
-	PointXYZ Br = PointXYZ(-19, 10, 0);
-	PointXYZ Cr = PointXYZ(-5, -20, 0);
-	PointXYZ Dr = PointXYZ(14, 4, 0);
-	PointXYZ Er = PointXYZ(-9, 9, 0);
+//	PointXYZ Ar = PointXYZ(19,-13,0);
+//	PointXYZ Br = PointXYZ(-19,-3,0);
+//	PointXYZ Cr = PointXYZ(-5,4,0);
+//	PointXYZ Dr = PointXYZ(14, 2, 0);
+//	PointXYZ Er = PointXYZ(-9,10,0);
+
+//	PointXYZ Ar = PointXYZ(18.6427,24,-15.511);
+//	PointXYZ Br = PointXYZ(-9.27182,24,12.1315);
+//	PointXYZ Cr = PointXYZ(2.83382,24,-9.70549);
+//	PointXYZ Dr = PointXYZ(3.18318,24,-18.8266);
+//	PointXYZ Er = PointXYZ(-15.3878,24,-3.08844);
+
+//	PointXYZ Ar = PointXYZ(19, 0, -13);
+//	PointXYZ Br = PointXYZ(-19, 0, -3);
+//	PointXYZ Cr = PointXYZ(-5, 0, 4);
+//	PointXYZ Dr = PointXYZ(14, 0, 2);
+//	PointXYZ Er = PointXYZ(-9, 0, 10);
+
+	PointXYZ Ar = PointXYZ(9.95448,0,-20.7583);
+	PointXYZ Br = PointXYZ(-17.9545,0,6.90192);
+	PointXYZ Cr = PointXYZ(-2.33013,0,5.9641);
+	PointXYZ Dr = PointXYZ(13.1244,0,-5.26795);
+	PointXYZ Er = PointXYZ(-2.79423,0,13.1603);
+
 
 	vector<PointXYZ> v2;
 	v2.push_back(Ar);
@@ -144,14 +188,15 @@ int main() {
 	v2.push_back(Dr);
 	v2.push_back(Er);
 
-
-	Quaternion q = Quaternion(DEG2RAD(30),PointXYZ(0,0,-1));
+	cout<<"QUATERNION ROTATION:\n";
+	Quaternion q = Quaternion(DEG2RAD(-30),PointXYZ(0,1,0));
 	q.out();
-	out(Quaternion::rotate(v3,q,Point2f(3,-2)));
+	out(Quaternion::rotate(v2,q,PointXYZ(0,0,0)));
+	cout<<q.toTransformationMatrix()<<endl;
 
 //	PointXYZ p = PointXYZ(0,0,0);
-//	PointXYZ p2=PointXYZ(2,2,0);
-//	PointXYZ s =PointXYZ(7,9,5);
+//	PointXYZ p = PointXYZ(2,2,0);
+//	PointXYZ s = PointXYZ(7,9,5);
 //	Quaternion v = Quaternion(0, s.x, s.y, s.z);
 
 //	PointXYZ I=p, C=p2;

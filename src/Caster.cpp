@@ -35,6 +35,12 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 		vector<Point2f> imagePoints) {
 	cloudCasted = false;
 	imageCasted = false;
+	
+	//imagePoint y-axis flip
+	//due to OpenCV and PCL representation differences
+//	for (int i=0; i<imagePoints.size(); i++) {
+	//	imagePoints[i].y *= -1;
+//	}
 
 	cout << "imagePoints:\n" << imagePoints << endl;
 
@@ -70,10 +76,12 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 #endif
 
 	this->tangentialPoint = P;
+	cout<<"tangential Point: "<<this->tangentialPoint<<endl;
 
 	calculateTangentialPlaneCoeff();
-
-	cout << "centered imagePoints:\n" << imagePoints << endl;
+	
+	cout <<"Tangential plane coeff: "<< A <<"\t"<<B<<"\t"<<C<<"\t"<<D<<endl;
+	cout << "\ncentered imagePoints:\n" << imagePoints << endl;
 	cout << "cloud point:\n";Utils::out(cloudPoints);
 
 	vector<PointXYZ> castedImage = imageOnPlane(this->A, this->B, this->C,
@@ -81,7 +89,7 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 	vector<PointXYZ> castedCloud = castCloudPoints(cloudPoints);
 
 	cout<<"casted image:\n";Utils::out(castedImage);
-	cout<<"casted cloud:\n";Utils::out(castedCloud);
+	cout<<"casted cloud:\n";Utils::out(castedCloud);cout<<endl;
 
 	//This is the index of reference point.
 	//TODO some intelligent choosing
@@ -110,22 +118,23 @@ Mat Caster::cloudToImage(vector<PointXYZ> cloudPoints,
 	PointXYZ vector = Utils::normalizeVector(
 			PointXYZ(this->A, this->B, this->C));
 
-	Quaternion qtrn = Quaternion(-angle, vector);
+	Quaternion qtrn = Quaternion(angle, vector);
+	cout<<"Normal vector: "<<vector<<this->tangentialPoint<<endl;
 	cout<<"Cast quaternion: "<<this->quaternion<<endl;
-	cout<<"Rotation q: "<<qtrn<<endl;
-	cout<<"Combined quaternion: "<<this->quaternion*qtrn<<endl;
+	cout<<"Rotation q: "<<qtrn<<" N: "<<qtrn.norm()<<endl;
+	cout<<"Combined quaternion: "<<this->quaternion*qtrn<<" N: "<<qtrn.norm()<<endl;
 	this->quaternion = this->quaternion * qtrn;
-	cout<<this->quaternion<<endl;
 
 	//Actual rotation
-	rotatedPoints = Quaternion::rotate(castedImage, qtrn, tangentialPoint);
+	rotatedPoints = Quaternion::rotate(castedImage, qtrn, this->tangentialPoint);
 //#endif
 	//TEMP
 //	vector<PointXYZ> rotatedPoints = castedCloud;
-	cout<<"Rotated Points:\n";
+	cout<<"\nRotated Points:\n";
 	Utils::out(rotatedPoints);
+	cout << "\n2nd Rot:\n";
 
-	cout<<"Cloud point: "<<castedCloud[referenceIdx]<<"\nCasted image: "<<castedImage[referenceIdx]<<"\nRotated point: "<<rotatedPoints[referenceIdx];
+//	cout<<"Cloud point: "<<castedCloud[referenceIdx]<<"\nCasted image: "<<castedImage[referenceIdx]<<"\nRotated point: "<<rotatedPoints[referenceIdx];
 
 	//Scale and scaling
 	Mat_<double> scaleMatrix = determineScale(castedCloud[referenceIdx],
@@ -182,13 +191,30 @@ vector<PointXYZ> Caster::imageOnPlane(double A, double B, double C, double D,
 	double phi = acos(C / sqrt(A * A + B * B + C * C));
 	double normVec = sqrt(B * B + A * A + C * C);
 	PointXYZ vector = PointXYZ(B / normVec, -A / normVec, 0);
-	Quaternion q = Quaternion(-phi, vector);
+//	PointXYZ vector = PointXYZ(B, -A, 0);
+	Quaternion q = Quaternion(phi, vector);
+	//cout<<q<<endl;
 
 	for (int i = 0; i < points.size(); i++) {
 		pointsIn3d.push_back(PointXYZ(points[i].x, points[i].y, 0));
 	}
 	this->quaternion=q;
-	points2 = Quaternion::rotate(pointsIn3d, q, tangentialPoint);
+cout<<"\nTUTEJ\n";out(pointsIn3d);
+	points2 = Quaternion::rotate(pointsIn3d, q);
+out(points2);
+	PointXYZ centroidAfterRotation = Utils::calculateCentroid(points2);
+	cout<<centroidAfterRotation;
+	cout<<this->tangentialPoint;
+	PointXYZ translationVector;
+	translationVector.x = this->tangentialPoint.x - centroidAfterRotation.x;
+	translationVector.y = this->tangentialPoint.y - centroidAfterRotation.y;
+	translationVector.z = this->tangentialPoint.z - centroidAfterRotation.z;
+	for (int i=0; i<points2.size(); i++) {
+		points2[i].x += this->tangentialPoint.x;
+		points2[i].y += this->tangentialPoint.y;
+		points2[i].z += this->tangentialPoint.z;
+	}
+	out(points2);
 	return points2;
 }
 
