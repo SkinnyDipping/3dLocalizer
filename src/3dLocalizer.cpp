@@ -22,8 +22,8 @@ using namespace cv;
 #define CLOUD_FILE "/home/michal/PDM/PointClouds/pcd/chmura.pcd"
 #define IMAGE_FILE "/home/michal/Desktop/sekwencje/123_frame.png"
 
-//#define VISUALIZATION
-//#define CLOUD_DATA
+#define VISUALIZATION
+#define CLOUD_DATA
 
 PointXYZRGB XYZ2XYZRGB(PointXYZ p, int r, int g, int b);
 PointXYZRGB XYZ2XYZRGB(PointXYZ p, uchar *val);
@@ -53,26 +53,21 @@ int main() {
 			imageKeypoints);
 	cout << transformationMatrix << endl;
 
-	cout << "\nTHE RESULT\nCloud Points:\n";
-	Utils::out(cloudKeypoints);
-	cout << "\nImage points:\n";
-	Utils::out(Utils::transformPoints(imageKeypoints, transformationMatrix));
-	Point2f centroid = Utils::calculateCentroid(imageKeypoints);
-
-
 	//Getting image PointCloud
 	PointCloud<PointXYZRGB>::Ptr image(new PointCloud<PointXYZRGB>);
 	Mat cvImage = imread(IMAGE_FILE);
-	for (int y = 0; y < cvImage.cols; y++)
-		for (int x = 0; x < cvImage.rows; x++) {
-			PointXYZ newCoordinates = Utils::transformPoint(Point2f(x,y), transformationMatrix, centroid);
-			image->push_back(XYZ2XYZRGB(newCoordinates, cvImage.at<Vec3b>(y,x).val));
+	cout << (int) cvImage.at<Vec3b>(0, 0).val[2] << endl;
+//	vector<Point2f> coors 
+	for (int y = 0; y < cvImage.rows; y++)
+		for (int x = 0; x < cvImage.cols; x++) {
+			PointXYZ newCoordinates = Utils::transformPoint(Point2f(x, y),
+					transformationMatrix,Point2f(cvImage.cols / 2, cvImage.rows / 2));
+			image->push_back(
+					XYZ2XYZRGB(newCoordinates,
+							(int) cvImage.at<Vec3b>(y, x).val[2],
+							(int) cvImage.at<Vec3b>(y, x).val[1],
+							(int) cvImage.at<Vec3b>(y, x).val[0]));
 		}
-
-	cout<<cvImage.size<<endl<<image->size();
-
-//	for (int i=0; i<image->size(); i++)
-//		cout<<image[i]<<endl;
 
 #ifdef VISUALIZATION
 	visualization::CloudViewer viewer("Simple Cloud Viewer");
