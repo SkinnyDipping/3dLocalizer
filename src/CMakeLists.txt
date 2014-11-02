@@ -14,5 +14,5 @@ add_definitions(${PCL_DEFINITIONS})
 set(3D_SOURCE 3dLocalizer.cpp Caster.cpp Utils.cpp Quaternion.cpp TransformationMatrix.cpp Sphere.cpp)
 set(TEST_SOURCE Test.cpp Caster.cpp Utils.cpp Quaternion.cpp TransformationMatrix.cpp Sphere.cpp)
 
-add_executable (3dLocalizer_exe ${TEST_SOURCE})
+add_executable (3dLocalizer_exe ${3D_SOURCE})
 target_link_libraries (3dLocalizer_exe ${PCL_LIBRARIES} ${OpenCV_LIBS})

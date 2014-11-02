@@ -12,7 +12,6 @@ Quaternion::Quaternion() {
 	this->x = 0;
 	this->y = 0;
 	this->z = 0;
-	normalize();
 }
 
 Quaternion::~Quaternion() {
@@ -26,7 +25,6 @@ Quaternion::Quaternion(double angle, PointXYZ vector) {
 	this->x = vector.x * sinus;
 	this->y = vector.y * sinus;
 	this->z = vector.z * sinus;
-	normalize();
 }
 
 Quaternion::Quaternion(double w, double x, double y, double z) {
@@ -34,7 +32,6 @@ Quaternion::Quaternion(double w, double x, double y, double z) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
-	normalize();
 }
 
 void Quaternion::normalize() {
