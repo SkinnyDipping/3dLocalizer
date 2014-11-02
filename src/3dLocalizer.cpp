@@ -26,6 +26,7 @@ using namespace cv;
 //#define CLOUD_DATA
 
 PointXYZRGB XYZ2XYZRGB(PointXYZ p, int r, int g, int b);
+PointXYZRGB XYZ2XYZRGB(PointXYZ p, uchar *val);
 PointXYZRGBA makeXYZRGBA(double x, double y, double z, double r, double g,
 		double b, double a);
 
@@ -35,10 +36,10 @@ inline vector<Point2f>& setImageKeypoints();
 int main() {
 
 	//Getting PointCloud
-	PointCloud<PointXYZRGB>::Ptr cloud(new PointCloud<PointXYZRGB>);
+	PointCloud<PointXYZ/*RGB*/>::Ptr cloud(new PointCloud<PointXYZ/*RGB*/>);
 
 #ifdef CLOUD_DATA
-	if (io::loadPCDFile<PointXYZRGB>(CLOUD_FILE, *cloud) == -1) {
+	if (io::loadPCDFile<PointXYZ/*RGB*/>(CLOUD_FILE, *cloud) == -1) {
 		cerr << "Could not load cloud data" << endl;
 		return -1;
 	}
@@ -56,26 +57,27 @@ int main() {
 	Utils::out(cloudKeypoints);
 	cout << "\nImage points:\n";
 	Utils::out(Utils::transformPoints(imageKeypoints, transformationMatrix));
-	cout<<"AND\n";
 	Point2f centroid = Utils::calculateCentroid(imageKeypoints);
-	for (int i=0; i<imageKeypoints.size(); i++)
-	{
-		cout<<Utils::transformPoint(imageKeypoints[i], transformationMatrix, centroid)<<endl;
-	}
+
 
 	//Getting image PointCloud
 	PointCloud<PointXYZRGB>::Ptr image(new PointCloud<PointXYZRGB>);
-	Mat_<float> cvImage = imread(IMAGE_FILE);
-	vector<Point2f> vImage;
+	Mat cvImage = imread(IMAGE_FILE);
 	for (int y = 0; y < cvImage.cols; y++)
 		for (int x = 0; x < cvImage.rows; x++) {
-			float newX, newY;
+			PointXYZ newCoordinates = Utils::transformPoint(Point2f(x,y), transformationMatrix, centroid);
+			image->push_back(XYZ2XYZRGB(newCoordinates, cvImage.at<Vec3b>(y,x).val));
 		}
+
+	cout<<cvImage.size<<endl<<image->size();
+
+//	for (int i=0; i<image->size(); i++)
+//		cout<<image[i]<<endl;
 
 #ifdef VISUALIZATION
 	visualization::CloudViewer viewer("Simple Cloud Viewer");
-//	viewer.showCloud(cloud, "Cloud");
-	viewer.showCloud(image, "Image");
+	viewer.showCloud(cloud, "Cloud");
+//	viewer.showCloud(image, "Image");
 	while (!viewer.wasStopped()) {
 	}
 #endif
@@ -131,6 +133,10 @@ PointXYZRGB XYZ2XYZRGB(PointXYZ p, int r, int g, int b) {
 	p2.y = p.y;
 	p2.z = p.z;
 	return p2;
+}
+
+PointXYZRGB XYZ2XYZRGB(PointXYZ p, uchar *val) {
+	return XYZ2XYZRGB(p, val[0], val[1], val[2]);
 }
 
 PointXYZRGBA makeXYZRGBA(double x, double y, double z, double r, double g,
